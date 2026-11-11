@@ -1,0 +1,39 @@
+@import url("https://use.typekit.net/fop2wxl.css");
+
+:root {
+  --color-background: #15192e;
+  --color-text: #ece9e9;
+  --color-accent: #78afff;
+  --color-hover: #990000;
+  --font-family-base: "lexia-mono-variable", serif;
+  --font-family-display: "alternate-gothic-atf", sans-serif;
+  --font-size-body: 1rem;
+  --font-size-h1: 11vw;
+  --font-size-h2: 5rem;
+  --font-size-h3: 2rem;
+  --font-size-small: 2rem;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-body);
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  margin: 0;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  margin: 0;
+}   
+ 
+
+p {
+  font-family: var(--font-family-base);
+  margin: 0;
+}
