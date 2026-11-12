@@ -1,0 +1,18 @@
+---
+import type { Chapter } from '../data/chapters';
+
+interface Props {
+  chapter: Chapter;
+}
+
+const { chapter } = Astro.props;
+---
+
+<a class="chapter-card" href={`/capitulos/${chapter.slug}/`}>
+  <span class="chapter-card__number">{chapter.number}</span>
+  <div>
+    <h2>{chapter.title}</h2>
+    <p>{chapter.summary}</p>
+  </div>
+  <span class="chapter-card__action" aria-hidden="true">Ver capítulo →</span>
+</a>

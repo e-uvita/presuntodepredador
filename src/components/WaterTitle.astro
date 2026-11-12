@@ -1,0 +1,152 @@
+---
+import logo from '../../img/logo.svg';
+import { titleShader } from '../data/chapters';
+---
+
+<div
+  class="water-title"
+  data-water-title
+  data-logo={logo.src}
+  data-settings={JSON.stringify(titleShader)}
+  aria-label="Presunto depredador"
+>
+  <canvas aria-hidden="true"></canvas>
+  <noscript><img src={logo.src} alt="Presunto depredador" /></noscript>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  interface ShaderSettings {
+    amplitude: number;
+    frequency: number;
+    speed: number;
+    noiseScale: number;
+    mouseInfluence: number;
+  }
+
+  const vertexShader = `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+
+    uniform sampler2D uTexture;
+    uniform float uTime;
+    uniform float uAmplitude;
+    uniform float uFrequency;
+    uniform float uSpeed;
+    uniform float uNoiseScale;
+    uniform float uMouseInfluence;
+    uniform vec2 uMouse;
+    uniform float uCanvasAspect;
+    uniform float uTextureAspect;
+    varying vec2 vUv;
+
+    float random(vec2 point) {
+      return fract(sin(dot(point, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+
+    float noise(vec2 point) {
+      vec2 cell = floor(point);
+      vec2 local = fract(point);
+      local = local * local * (3.0 - 2.0 * local);
+      return mix(
+        mix(random(cell), random(cell + vec2(1.0, 0.0)), local.x),
+        mix(random(cell + vec2(0.0, 1.0)), random(cell + vec2(1.0, 1.0)), local.x),
+        local.y
+      );
+    }
+
+    void main() {
+      vec2 uv = vUv;
+
+      if (uCanvasAspect > uTextureAspect) {
+        float scale = uTextureAspect / uCanvasAspect;
+        uv.y = (uv.y - 0.5) / scale + 0.5;
+      } else {
+        float scale = uCanvasAspect / uTextureAspect;
+        uv.x = (uv.x - 0.5) / scale + 0.5;
+      }
+
+      float turbulence = noise(uv * uNoiseScale + uTime * uSpeed);
+      float wave = sin(uv.y * uFrequency + turbulence * 5.0 + uTime * uSpeed);
+      vec2 mouseOffset = (uMouse - 0.5) * uMouseInfluence;
+      uv.x += wave * uAmplitude + mouseOffset.x * (1.0 - uv.y);
+      uv.y += cos(uv.x * uFrequency * 0.55 + uTime * uSpeed) * uAmplitude * 0.35 + mouseOffset.y;
+
+      if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) discard;
+      gl_FragColor = texture2D(uTexture, uv);
+    }
+  `;
+
+  document.querySelectorAll<HTMLElement>('[data-water-title]').forEach((root) => {
+    const canvas = root.querySelector('canvas');
+    const logoUrl = root.dataset.logo;
+    if (!canvas || !logoUrl) return;
+
+    const settings = JSON.parse(root.dataset.settings ?? '{}') as ShaderSettings;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.Camera();
+    const texture = new THREE.TextureLoader().load(logoUrl, () => resize());
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    const uniforms = {
+      uTexture: { value: texture },
+      uTime: { value: 0 },
+      uAmplitude: { value: settings.amplitude },
+      uFrequency: { value: settings.frequency },
+      uSpeed: { value: settings.speed },
+      uNoiseScale: { value: settings.noiseScale },
+      uMouseInfluence: { value: settings.mouseInfluence },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uCanvasAspect: { value: 1 },
+      uTextureAspect: { value: 17.2931697722 / 6.7367340918 },
+    };
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      const width = root.clientWidth;
+      const height = root.clientHeight;
+      renderer.setSize(width, height, false);
+      uniforms.uCanvasAspect.value = width / Math.max(height, 1);
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = new THREE.Clock();
+
+    function render() {
+      uniforms.uTime.value = reduceMotion ? 0 : clock.getElapsedTime();
+      renderer.render(scene, camera);
+      requestAnimationFrame(render);
+    }
+
+    root.addEventListener('pointermove', (event) => {
+      const rect = root.getBoundingClientRect();
+      uniforms.uMouse.value.set(
+        (event.clientX - rect.left) / rect.width,
+        1 - (event.clientY - rect.top) / rect.height,
+      );
+    });
+
+    new ResizeObserver(resize).observe(root);
+    resize();
+    render();
+  });
+</script>

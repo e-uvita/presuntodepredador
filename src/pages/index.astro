@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WaterTitle from '../components/WaterTitle.astro';
+import ChapterCard from '../components/ChapterCard.astro';
+import { chapters } from '../data/chapters';
+---
+
+<BaseLayout>
+  <main>
+    <header class="hero">
+      <WaterTitle />
+      <div class="hero__copy">
+        <p class="eyebrow">Serie documental · prototipo</p>
+        <h1>El tiburón que existe y el que imaginamos</h1>
+        <p>
+          Tres momentos para recorrer una historia desde el sonido, la palabra y una mirada en 360 grados.
+        </p>
+      </div>
+    </header>
+
+    <section class="chapters" aria-labelledby="chapters-title">
+      <p class="eyebrow" id="chapters-title">Capítulos</p>
+      <div class="chapters__list">
+        {chapters.map((chapter) => <ChapterCard chapter={chapter} />)}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
