@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PanoramaPlayer from '../../components/PanoramaPlayer.astro';
+import { chapters, type Chapter } from '../../data/chapters';
+
+export function getStaticPaths() {
+  return chapters.map((chapter) => ({
+    params: { slug: chapter.slug },
+    props: { chapter },
+  }));
+}
+
+interface Props {
+  chapter: Chapter;
+}
+
+const { chapter } = Astro.props;
+const chapterIndex = chapters.findIndex((item) => item.slug === chapter.slug);
+const previous = chapters[chapterIndex - 1];
+const next = chapters[chapterIndex + 1];
+---
+
+<BaseLayout title={`${chapter.title} — Presunto depredador`} description={chapter.summary}>
+  <main class="chapter-detail">
+    <a class="back-link" href="/">← Volver a los capítulos</a>
+
+    <header class="chapter-detail__header">
+      <p class="eyebrow">Capítulo {chapter.number}</p>
+      <h1>{chapter.title}</h1>
+      <p>{chapter.summary}</p>
+    </header>
+
+    <PanoramaPlayer chapter={chapter} />
+
+    <nav class="chapter-nav" aria-label="Navegación entre capítulos">
+      {previous ? <a href={`/capitulos/${previous.slug}/`}>← {previous.title}</a> : <span></span>}
+      {next ? <a href={`/capitulos/${next.slug}/`}>{next.title} →</a> : <a href="/">Volver al inicio</a>}
+    </nav>
+  </main>
+</BaseLayout>
