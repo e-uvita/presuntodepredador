@@ -1,78 +1,65 @@
 # Presunto depredador
 
-Prototipo académico de una serie documental de tres capítulos. La portada presenta el título SVG con una distorsión GLSL y cada capítulo abre un video equirectangular dentro de un reproductor 360 hecho con Three.js.
+Borrador local de la serie audiovisual de Elizabeth Lezama Jacinto. Astro genera un sitio estático para GitHub Pages. Esta entrega conserva todos los cambios sin commits ni publicación.
 
-## Tecnologías
+## Empezar
 
-- Astro para páginas, rutas y componentes.
-- Three.js para el shader tipográfico y el panorama 360.
-- GLSL para deformar el título SVG.
-- HTML y CSS para los controles y subtítulos.
-- TypeScript para los datos, el reproductor y el parser SRT.
-
-## Ejecutar el proyecto
-
-```bash
-npm install
-npm run dev
+```sh
+bun install
+bun run dev
 ```
 
-Para generar la versión estática:
+Abrir <http://localhost:4321/presuntodepredador/>. La página de tipografía está en `/presuntodepredador/tipografia/`.
 
-```bash
-npm run build
+## Dónde editar
+
+| Cambio                                                    | Archivo                                                         |
+| --------------------------------------------------------- | --------------------------------------------------------------- |
+| Colores, fuentes del sitio, radios y ancho                | [theme.css](src/styles/theme.css)                               |
+| Declarar fuentes locales                                  | [fonts.css](src/styles/fonts.css) y archivos en `public/fonts/` |
+| Nombre, tagline, imagen principal, marca y kit de fuentes | [site.ts](src/config/site.ts)                                   |
+| Videos, narración, subtítulos, títulos y miniaturas       | [chapters.ts](src/data/chapters.ts)                             |
+| Sinopsis y créditos                                       | [story.ts](src/data/story.ts)                                   |
+| Familias, capas y descargas de la página de tipografía    | [typefaces.ts](src/data/typefaces.ts)                           |
+
+La guía [docs/HANDOFF.md](docs/HANDOFF.md) incluye ejemplos y el mapa de componentes. Los agentes deben leer [AGENTS.md](AGENTS.md); Claude y Cursor tienen entradas que apuntan al mismo documento.
+
+## Estado de los activos
+
+Los tres episodios comparten un video de muestra de 120 segundos **sin audio**. El MP4 se convirtió de EAC a equirectangular 2:1 y ocupa unos 6.9 MB. La narración y los subtítulos finales siguen pendientes. Los videos e imágenes están en `public/media/video/` y `public/media/images/`; las carpetas de audio/subtítulos se agregan cuando existan sus archivos.
+
+`public/branding/mark.svg` es una aproximación provisional. Reemplazar con el activo original de la autora. El símbolo también se utiliza como favicon; el título `public/branding/title.svg` es otro activo, independiente de las fuentes CSS. Las referencias locales están en [docs/design/](docs/design/); no hace falta conectar Figma.
+
+La tipografía utiliza actualmente el kit Adobe existente. Se pueden declarar fuentes locales en `fonts.css` y desactivar ese kit desde `site.ts`. El catálogo de muestras admite capas y enlaces de descarga solo cuando existan sus fuentes; los ejemplos están comentados en `typefaces.ts`.
+
+## Verificar y compilar
+
+```sh
+bun test
+python3 tests/package-source.test.py
+bun run check
+bun run build
+bun run preview --host 127.0.0.1 --port 4322
 ```
 
-## Estructura
+Con Playwright y sus navegadores disponibles, en otra terminal:
 
-```text
-src/
-├── components/       Componentes visuales y reproductor
-├── data/             Configuración editable de capítulos y shader
-├── layouts/          Documento HTML base
-├── lib/              Parser de subtítulos SRT
-├── pages/            Portada y páginas de capítulo
-└── styles/           CSS global mínimo
-
-public/subtitles/     Archivos SRT servidos sin transformación
-img/logo.svg          Título original utilizado por el shader
+```sh
+uv run --with playwright python scripts/check-site.py http://127.0.0.1:4322/presuntodepredador/
 ```
 
-## Editar los capítulos
+El chequeo recorre escritorio, tablet y móvil, reproductor, animación, tipografía y errores. Las capturas se guardan en el directorio temporal `presunto-qa`.
 
-Los tres capítulos se configuran en `src/data/chapters.ts`. Cada entrada acepta:
+`bun run build` genera `dist/`. El prefijo `/presuntodepredador` se configura en `astro.config.mjs`; usar `/` si se cambia a un dominio propio. Los helpers de `src/lib/paths.ts` aplican ese prefijo a rutas y activos. Cada página tiene un `index.html` y `.nojekyll` evita el procesamiento de Jekyll. El código fuente y sus referencias de diseño no se copian al sitio publicado.
 
-- `videoSrc`: video panorámico equirectangular, de preferencia en proporción 2:1.
-- `audioSrc`: audio separado, cuando se utiliza `audioMode: 'separate'`.
-- `subtitlesSrc`: ruta a un archivo `.srt`.
-- `audioMode`: `separate` para audio externo o `integrated` cuando el MP4 ya tiene audio.
-- `loopVideo`: permite repetir el video visual provisional mientras avanza un audio más largo.
+## Compartir como ZIP
 
-El demo reutiliza temporalmente el mismo video, audio y SRT en los tres capítulos. Cuando existan los medios definitivos, sólo deben cambiarse las rutas de cada objeto.
+```sh
+python3 scripts/package-source.py --output /tmp/presunto-depredador-source.zip
+```
 
-## Control de reproducción
+Incluye código, medios optimizados, documentación, referencias y la carpeta `.git` existente, con historial, ramas, remoto e índice. Los cambios de esta entrega siguen sin commits. Al extraerlo ya es un repositorio: no hace falta ejecutar `git init`. El destinatario puede revisar los cambios y crear varios commits con sus agentes, conservando el historial previo; las ramas todavía requieren revisión e integración.
 
-El reproductor tiene deliberadamente pocos controles:
+Excluye dependencias, compilaciones, cachés y archivos de entorno sin seguimiento. Solo si se quiere una copia sin historial, añadir `--without-git` explícitamente. La carpeta `.git` original no se modifica al empaquetar.
 
-- Un botón alterna entre reproducir y pausar.
-- Un `input[type="range"]` controla el tiempo.
-- Un botón silencia o activa el audio.
-- Arrastrar dentro del canvas cambia la dirección de la cámara.
-
-Cuando el audio está separado, éste es el reloj principal para la línea de tiempo y los subtítulos. El video se reproduce al mismo tiempo. En el demo el panorama se repite porque los medios provisionales tienen duraciones distintas. Para medios finales sincronizados se recomienda que video, audio y SRT comiencen en `00:00:00` y tengan la misma duración, o integrar el audio directamente en el MP4.
-
-## Parámetros del shader
-
-El objeto `titleShader` en `src/data/chapters.ts` expone:
-
-- `amplitude`: intensidad de la distorsión.
-- `frequency`: cantidad de ondas.
-- `speed`: velocidad de animación.
-- `noiseScale`: escala del ruido procedural.
-- `mouseInfluence`: respuesta al movimiento del cursor.
-
-## Referencias
-
-- [Three.js: equirectangular video panorama](https://github.com/mrdoob/three.js/blob/master/examples/webgl_video_panorama_equirectangular.html)
-- [srt-reactive-visualization](https://github.com/juanfuent-es/srt-reactive-visualization)
-- [audio-subtitles-generator](https://github.com/juanfuent-es/audio-subtitles-generator), utilizado como referencia para generar archivos SRT y como fuente del audio provisional.
+El script `scripts/prepare-media.py` reproduce los activos del demo con `--video` y `--reference` explícitos. Solo hace falta si se vuelve a preparar esa muestra EAC; no se necesita para instalar, desarrollar o compilar.
