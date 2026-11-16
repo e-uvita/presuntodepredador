@@ -1,0 +1,80 @@
+---
+import { typefaces, specimen } from "../../data/typefaces";
+const initial = typefaces[0];
+---
+
+{
+  initial && (
+    <section
+      class="type-specimen"
+      data-specimen
+      data-typefaces={JSON.stringify(typefaces)}
+      data-defaults={JSON.stringify(specimen)}
+      aria-label="Previsualización de tipografía"
+    >
+      <div class="specimen-controls" data-specimen-controls hidden>
+        <label>
+          Familia
+          <select data-family>
+            {typefaces.map((face) => (
+              <option value={face.id}>{face.name}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Tamaño <output data-size-output>{specimen.size} px</output>
+          <input
+            data-size
+            type="range"
+            min={specimen.minSize}
+            max={specimen.maxSize}
+            value={specimen.size}
+          />
+        </label>
+        <button class="specimen-button" data-reset type="button">
+          Restablecer
+        </button>
+        <label class="specimen-text-label">
+          Tu texto
+          <textarea data-text rows="3" maxlength="400">
+            {specimen.text}
+          </textarea>
+        </label>
+        <fieldset data-layers hidden>
+          <>
+            <legend>Capas</legend>
+            <div data-layer-options />
+          </>
+        </fieldset>
+      </div>
+      <div
+        class="specimen-preview"
+        data-preview
+        role="img"
+        aria-label={specimen.text}
+        style={`--specimen-size: ${specimen.size}px; --specimen-font: ${initial.cssFamily}`}
+      >
+        <span data-preview-text>{specimen.text}</span>
+      </div>
+      <p class="specimen-empty" data-empty hidden>
+        Activa una capa para ver el texto.
+      </p>
+      <a
+        class="specimen-button specimen-download"
+        data-download
+        href={initial.downloadSrc}
+        hidden={!initial.downloadSrc}
+        download
+      >
+        Descargar tipografía
+      </a>
+    </section>
+  )
+}
+
+<script>
+  import { initTypography } from "../../lib/typography";
+  document
+    .querySelectorAll<HTMLElement>("[data-specimen]")
+    .forEach(initTypography);
+</script>

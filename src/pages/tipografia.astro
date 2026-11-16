@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
+import TypeSpecimen from "../components/typography/TypeSpecimen.astro";
+import { site } from "../config/site";
+import "../styles/typography.css";
+---
+
+<BaseLayout
+  title={`Tipografía — ${site.name}`}
+  description="Un espacio para explorar las formas de las letras, sus capas y sus combinaciones."
+>
+  <SiteNav active="typography" />
+  <main id="contenido" class="typography-page content-width">
+    <header class="typography-header">
+      <p class="eyebrow">{site.name} · En desarrollo</p>
+      <h1>Tipografía</h1>
+      <p>Las palabras también cambian de forma.</p>
+    </header>
+    <TypeSpecimen />
+  </main>
+</BaseLayout>
