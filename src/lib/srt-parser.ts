@@ -5,39 +5,52 @@ export interface SubtitleCue {
 }
 
 function timestampToSeconds(timestamp: string) {
-  const normalized = timestamp.trim().replace(',', '.');
-  const parts = normalized.split(':').map(Number);
-  if (parts.some(Number.isNaN)) return 0;
-
-  const seconds = parts.pop() ?? 0;
-  const minutes = parts.pop() ?? 0;
-  const hours = parts.pop() ?? 0;
-  return hours * 3600 + minutes * 60 + seconds;
+  const match = timestamp
+    .trim()
+    .match(/^(\d{2,}):([0-5]\d):([0-5]\d)[,.](\d{3})$/);
+  if (!match) return NaN;
+  const [, hours, minutes, seconds, milliseconds] = match;
+  return (
+    Number(hours) * 3600 +
+    Number(minutes) * 60 +
+    Number(seconds) +
+    Number(milliseconds) / 1000
+  );
 }
 
 export function parseSrt(source: string): SubtitleCue[] {
   return source
-    .replace(/^\uFEFF/, '')
-    .replace(/\r\n?/g, '\n')
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
     .trim()
     .split(/\n{2,}/)
     .map((block) => {
-      const lines = block.split('\n');
-      const timeIndex = lines.findIndex((line) => line.includes('-->'));
+      const lines = block.split("\n");
+      const timeIndex = lines.findIndex((line) => line.includes("-->"));
       if (timeIndex < 0) return null;
 
       const timingLine = lines[timeIndex];
       if (!timingLine) return null;
-      const [startText, endText] = timingLine.split('-->').map((part) => part.trim());
+      const [startText, endText] = timingLine
+        .split("-->")
+        .map((part) => part.trim());
       if (!startText || !endText) return null;
 
+      const start = timestampToSeconds(startText);
+      const end = timestampToSeconds(endText.split(/\s+/)[0] ?? endText);
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+        return null;
       return {
-        start: timestampToSeconds(startText),
-        end: timestampToSeconds(endText.split(/\s+/)[0] ?? endText),
-        text: lines.slice(timeIndex + 1).join('\n').trim(),
+        start,
+        end,
+        text: lines
+          .slice(timeIndex + 1)
+          .join("\n")
+          .trim(),
       };
     })
-    .filter((cue): cue is SubtitleCue => Boolean(cue?.text));
+    .filter((cue): cue is SubtitleCue => Boolean(cue?.text))
+    .sort((a, b) => a.start - b.start);
 }
 
 export function cueAtTime(cues: SubtitleCue[], time: number) {
@@ -49,7 +62,7 @@ export function cueAtTime(cues: SubtitleCue[], time: number) {
     const cue = cues[middle];
     if (!cue) return undefined;
     if (time < cue.start) high = middle - 1;
-    else if (time > cue.end) low = middle + 1;
+    else if (time >= cue.end) low = middle + 1;
     else return cue;
   }
 

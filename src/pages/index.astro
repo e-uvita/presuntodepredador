@@ -1,28 +1,124 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import WaterTitle from '../components/WaterTitle.astro';
-import ChapterCard from '../components/ChapterCard.astro';
-import { chapters } from '../data/chapters';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import WaterTitle from "../components/WaterTitle.astro";
+import ChapterCard from "../components/ChapterCard.astro";
+import Icon from "../components/Icon.astro";
+import SiteNav from "../components/SiteNav.astro";
+import { site } from "../config/site";
+import { chapters } from "../data/chapters";
+import { synopsis, credits } from "../data/story";
+import { chapterHref } from "../lib/paths";
+const firstChapter = chapters[0];
+const hasPreviews = chapters.some((chapter) => chapter.isPreview);
 ---
 
 <BaseLayout>
-  <main>
-    <header class="hero">
-      <WaterTitle />
-      <div class="hero__copy">
-        <p class="eyebrow">Serie documental · prototipo</p>
-        <h1>El tiburón que existe y el que imaginamos</h1>
-        <p>
-          Tres momentos para recorrer una historia desde el sonido, la palabra y una mirada en 360 grados.
-        </p>
+  <main id="contenido">
+    <header class="hero" data-hero>
+      <img
+        class="hero__poster"
+        src={site.heroImage}
+        alt={site.heroImageAlt}
+        width="1600"
+        height="1200"
+        fetchpriority="high"
+      />
+      <div class="hero__shade"></div>
+      <SiteNav active="series" />
+      <div class="hero__title">
+        <h1 class="sr-only">{site.name}</h1>
+        <WaterTitle />
+        <p class="hero__tagline">{site.tagline}</p>
       </div>
+      <div class="hero__bottom">
+        {
+          firstChapter && (
+            <a class="watch-button" href={chapterHref(firstChapter.slug)}>
+              Ver episodio {firstChapter.number} <Icon name="play" />
+            </a>
+          )
+        }
+        <div class="hero__tools" hidden data-hero-tools>
+          <button
+            class="round-button"
+            type="button"
+            data-motion
+            aria-label="Pausar animación"
+            aria-pressed="false"
+            ><span data-pause-icon><Icon name="pause" /></span><span
+              data-play-icon
+              hidden><Icon name="play" /></span
+            ></button
+          >
+        </div>
+      </div>
+      <a class="hero__scroll" href="#sinopsis" aria-label="Leer sinopsis"
+        ><span>Una mirada desde el agua</span><Icon name="down" /></a
+      >
     </header>
 
-    <section class="chapters" aria-labelledby="chapters-title">
-      <p class="eyebrow" id="chapters-title">Capítulos</p>
-      <div class="chapters__list">
-        {chapters.map((chapter) => <ChapterCard chapter={chapter} />)}
+    <div class="ocean-content">
+      <div class="content-width">
+        <section
+          class="synopsis"
+          id="sinopsis"
+          aria-labelledby="synopsis-title"
+        >
+          <p class="eyebrow">{site.year} · {chapters.length} episodios</p>
+          <h2 id="synopsis-title">Sinopsis</h2>
+          <div class="synopsis__text">
+            {synopsis.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        </section>
+        <section
+          class="chapters"
+          id="episodios"
+          aria-labelledby="chapters-title"
+        >
+          <div class="section-heading">
+            <h2 id="chapters-title">Episodios</h2><span
+              >{String(chapters.length).padStart(2, "0")} episodios</span
+            >
+          </div>
+          <ol class="chapters__list">
+            {chapters.map((chapter) => <ChapterCard chapter={chapter} />)}
+          </ol>
+          {
+            hasPreviews && (
+              <p class="preview-note">
+                Algunos episodios incluyen por ahora un video de muestra.
+              </p>
+            )
+          }
+        </section>
+        <details class="credits">
+          <summary>Créditos <span aria-hidden="true">+</span></summary>
+          <dl>
+            {
+              credits.map(([role, name]) => (
+                <div>
+                  <>
+                    <dt>{role}</dt>
+                    <dd>{name}</dd>
+                  </>
+                </div>
+              ))
+            }
+          </dl>
+        </details>
+        <footer class="footer">
+          <span>{site.name}</span><span>{site.year}</span><a
+            href="#contenido"
+            aria-label="Volver al inicio">Volver a la superficie ↑</a
+          >
+        </footer>
       </div>
-    </section>
+    </div>
   </main>
 </BaseLayout>
+
+<script>
+  import { initHero } from "../lib/hero";
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
+  if (hero) initHero(hero);
+</script>

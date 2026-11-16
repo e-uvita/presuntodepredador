@@ -1,18 +1,34 @@
 ---
-import type { Chapter } from '../data/chapters';
-
+import type { Chapter } from "../data/chapters";
+import { chapterHref } from "../lib/paths";
+import Icon from "./Icon.astro";
 interface Props {
   chapter: Chapter;
 }
-
 const { chapter } = Astro.props;
 ---
 
-<a class="chapter-card" href={`/capitulos/${chapter.slug}/`}>
-  <span class="chapter-card__number">{chapter.number}</span>
-  <div>
-    <h2>{chapter.title}</h2>
-    <p>{chapter.summary}</p>
-  </div>
-  <span class="chapter-card__action" aria-hidden="true">Ver capítulo →</span>
-</a>
+<li>
+  <a class="chapter-card" href={chapterHref(chapter.slug)}>
+    <span class="chapter-card__number" aria-hidden="true">{chapter.number}</span
+    >
+    <div class="chapter-card__image">
+      <img
+        src={chapter.posterSrc}
+        alt=""
+        width="480"
+        height="270"
+        loading="lazy"
+        decoding="async"
+      />
+      <span class="chapter-card__play"><Icon name="play" /></span>
+    </div>
+    <div class="chapter-card__copy">
+      <span class="sr-only">Episodio {chapter.number}: </span>
+      <h3>{chapter.title}</h3>
+      <p>{chapter.summary}</p>
+    </div>
+    <span class="chapter-card__duration">{chapter.durationLabel}</span>
+    <span class="chapter-card__arrow"><Icon name="arrow" /></span>
+  </a>
+</li>

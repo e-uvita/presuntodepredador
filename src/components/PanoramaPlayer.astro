@@ -1,30 +1,109 @@
 ---
-import type { Chapter } from '../data/chapters';
-
+import type { Chapter } from "../data/chapters";
+import { chapterHref } from "../lib/paths";
+import Icon from "./Icon.astro";
 interface Props {
   chapter: Chapter;
+  nextChapter?: Chapter;
+  homeHref?: string;
 }
-
-const { chapter } = Astro.props;
+const {
+  chapter,
+  nextChapter,
+  homeHref = `${import.meta.env.BASE_URL}#episodios`,
+} = Astro.props;
 ---
 
 <section
   class="player"
   data-panorama-player
-  data-video={chapter.videoSrc}
+  data-projection={chapter.projection}
+  data-has-audio={String(chapter.hasAudio)}
   data-audio={chapter.audioSrc}
   data-subtitles={chapter.subtitlesSrc}
-  data-audio-mode={chapter.audioMode}
-  data-loop-video={String(chapter.loopVideo)}
+  data-loop={String(Boolean(chapter.loopVideo))}
+  tabindex="0"
+  aria-label={`Reproductor: ${chapter.title}`}
 >
-  <div class="player__viewport">
-    <canvas aria-label={`Video 360: ${chapter.title}`}></canvas>
-    <p class="player__hint">Arrastra para mirar alrededor</p>
-    <div class="player__subtitle" aria-live="polite" aria-atomic="true"></div>
+  <video
+    src={chapter.videoSrc}
+    poster={chapter.posterSrc}
+    playsinline
+    preload="metadata"
+    controls
+    aria-label={`Video: ${chapter.title}`}></video>
+  <canvas hidden aria-hidden="true"></canvas>
+  <audio hidden preload="metadata"></audio>
+  <div class="shade"></div>
+  <a class="back round" href={homeHref} aria-label="Volver a los episodios"
+    ><Icon name="back" /></a
+  >
+  <span class="badge"
+    >{
+      chapter.projection === "equirectangular"
+        ? "360°"
+        : "Video de demostración"
+    }</span
+  >
+  <p class="hint" hidden>Arrastra o usa Mayús + flechas para mirar alrededor</p>
+  <div class="subtitle"></div>
+  <div class="notice" data-notice hidden>
+    <p data-status role="status"></p>
+    <button type="button" data-retry>Reintentar</button>
+    {
+      nextChapter && (
+        <a href={chapterHref(nextChapter.slug)} data-next hidden>
+          Siguiente episodio →
+        </a>
+      )
+    }
   </div>
-
-  <div class="player__controls">
-    <button type="button" data-play>Reproducir</button>
+  <div class="controls" hidden>
+    <div class="actions">
+      <button class="round" type="button" data-play aria-label="Reproducir"
+        ><span data-icon-play><Icon name="play" /></span><span
+          data-icon-pause
+          hidden><Icon name="pause" /></span
+        ></button
+      >
+      <output data-time>00:00 / 00:00</output>
+      <span class="spacer"></span>
+      {
+        chapter.subtitlesSrc && (
+          <button
+            class="round small"
+            type="button"
+            data-captions
+            aria-label="Desactivar subtítulos"
+            aria-pressed="true"
+          >
+            CC
+          </button>
+        )
+      }
+      <button
+        class="round small"
+        type="button"
+        data-fullscreen
+        aria-label="Pantalla completa"><Icon name="fullscreen" /></button
+      >
+      <button
+        class="round"
+        type="button"
+        data-mute
+        disabled={!chapter.hasAudio && !chapter.audioSrc}
+        aria-label={chapter.hasAudio || chapter.audioSrc
+          ? "Silenciar"
+          : "Este video no tiene audio"}
+        title={chapter.hasAudio || chapter.audioSrc
+          ? "Silenciar"
+          : "Este video no tiene audio"}
+        ><span data-icon-sound><Icon name="sound" /></span><span
+          data-icon-muted
+          hidden><Icon name="muted" /></span
+        ></button
+      >
+    </div>
     <input
       type="range"
       min="0"
@@ -34,202 +113,236 @@ const { chapter } = Astro.props;
       aria-label="Línea de tiempo"
       data-seek
     />
-    <output data-time>00:00 / 00:00</output>
-    <button type="button" data-mute>Silenciar</button>
   </div>
-
-  <p class="player__status" data-status>Cargando medios…</p>
-  <video crossorigin="anonymous" playsinline preload="metadata" hidden></video>
-  <audio crossorigin="anonymous" preload="metadata" hidden></audio>
 </section>
 
 <script>
-  import * as THREE from 'three';
-  import { cueAtTime, parseSrt, type SubtitleCue } from '../lib/srt-parser';
-
-  const formatTime = (seconds: number) => {
-    if (!Number.isFinite(seconds)) return '00:00';
-    const minutes = Math.floor(seconds / 60);
-    const remainder = Math.floor(seconds % 60);
-    return `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
-  };
-
-  document.querySelectorAll<HTMLElement>('[data-panorama-player]').forEach((root) => {
-    const canvas = root.querySelector('canvas');
-    const video = root.querySelector('video');
-    const audio = root.querySelector('audio');
-    const playButton = root.querySelector<HTMLButtonElement>('[data-play]');
-    const muteButton = root.querySelector<HTMLButtonElement>('[data-mute]');
-    const seek = root.querySelector<HTMLInputElement>('[data-seek]');
-    const timeOutput = root.querySelector<HTMLOutputElement>('[data-time]');
-    const subtitle = root.querySelector<HTMLElement>('.player__subtitle');
-    const status = root.querySelector<HTMLElement>('[data-status]');
-    const viewport = root.querySelector<HTMLElement>('.player__viewport');
-
-    if (!canvas || !video || !audio || !playButton || !muteButton || !seek || !timeOutput || !subtitle || !status || !viewport) return;
-
-    // Alias no anulables: el componente controla este marcado y ya se validó arriba.
-    const canvasElement = canvas;
-    const videoElement = video;
-    const audioElement = audio;
-    const playControl = playButton;
-    const muteControl = muteButton;
-    const seekControl = seek;
-    const timeControl = timeOutput;
-    const subtitleElement = subtitle;
-    const statusElement = status;
-    const viewportElement = viewport;
-
-    const audioMode = root.dataset.audioMode ?? 'integrated';
-    const usesSeparateAudio = audioMode === 'separate' && Boolean(root.dataset.audio);
-    const loopVideo = root.dataset.loopVideo === 'true';
-    let cues: SubtitleCue[] = [];
-    let dragging = false;
-    let pointerX = 0;
-    let pointerY = 0;
-    let startLongitude = 0;
-    let startLatitude = 0;
-    let longitude = 0;
-    let latitude = 0;
-
-    videoElement.src = root.dataset.video ?? '';
-    videoElement.muted = usesSeparateAudio;
-    videoElement.loop = loopVideo;
-    if (usesSeparateAudio) audioElement.src = root.dataset.audio ?? '';
-
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasElement, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
-    const geometry = new THREE.SphereGeometry(5, 48, 32);
-    geometry.scale(-1, 1, 1);
-    const texture = new THREE.VideoTexture(videoElement);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-    scene.add(new THREE.Mesh(geometry, material));
-
-    const master = () => (usesSeparateAudio ? audioElement : videoElement);
-    const duration = () => master().duration;
-    const currentTime = () => master().currentTime;
-
-    function resize() {
-      const width = viewportElement.clientWidth;
-      const height = viewportElement.clientHeight;
-      renderer.setSize(width, height, false);
-      camera.aspect = width / Math.max(height, 1);
-      camera.updateProjectionMatrix();
-    }
-
-    function updateInterface() {
-      const total = duration();
-      const current = currentTime();
-      if (Number.isFinite(total)) {
-        seekControl.max = String(total);
-        seekControl.value = String(current);
-      }
-      timeControl.value = `${formatTime(current)} / ${formatTime(total)}`;
-      subtitleElement.textContent = cueAtTime(cues, current)?.text ?? '';
-    }
-
-    function seekAll(nextTime: number) {
-      if (usesSeparateAudio) {
-        audioElement.currentTime = nextTime;
-        if (Number.isFinite(videoElement.duration) && videoElement.duration > 0) {
-          videoElement.currentTime = loopVideo ? nextTime % videoElement.duration : Math.min(nextTime, videoElement.duration);
-        }
-      } else {
-        videoElement.currentTime = nextTime;
-      }
-      updateInterface();
-    }
-
-    async function togglePlayback() {
-      if (!master().paused) {
-        videoElement.pause();
-        audioElement.pause();
-        playControl.textContent = 'Reproducir';
-        return;
-      }
-
-      try {
-        if (usesSeparateAudio) {
-          if (Number.isFinite(videoElement.duration) && videoElement.duration > 0) {
-            videoElement.currentTime = loopVideo ? audioElement.currentTime % videoElement.duration : audioElement.currentTime;
-          }
-          await Promise.all([videoElement.play(), audioElement.play()]);
-        } else {
-          await videoElement.play();
-        }
-        playControl.textContent = 'Pausar';
-        statusElement.textContent = '';
-      } catch {
-        statusElement.textContent = 'El navegador no pudo reproducir alguno de los medios.';
-      }
-    }
-
-    playControl.addEventListener('click', togglePlayback);
-    muteControl.addEventListener('click', () => {
-      const audibleMedia = usesSeparateAudio ? audioElement : videoElement;
-      audibleMedia.muted = !audibleMedia.muted;
-      muteControl.textContent = audibleMedia.muted ? 'Activar audio' : 'Silenciar';
-    });
-    seekControl.addEventListener('input', () => seekAll(Number(seekControl.value)));
-
-    master().addEventListener('loadedmetadata', () => {
-      statusElement.textContent = 'Listo para reproducir.';
-      updateInterface();
-    });
-    master().addEventListener('ended', () => {
-      videoElement.pause();
-      audioElement.pause();
-      playControl.textContent = 'Reproducir';
-    });
-
-    viewportElement.addEventListener('pointerdown', (event) => {
-      dragging = true;
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      startLongitude = longitude;
-      startLatitude = latitude;
-      viewportElement.setPointerCapture(event.pointerId);
-    });
-    viewportElement.addEventListener('pointermove', (event) => {
-      if (!dragging) return;
-      longitude = (pointerX - event.clientX) * 0.12 + startLongitude;
-      latitude = (event.clientY - pointerY) * 0.12 + startLatitude;
-    });
-    viewportElement.addEventListener('pointerup', () => (dragging = false));
-    viewportElement.addEventListener('pointercancel', () => (dragging = false));
-
-    async function loadSubtitles() {
-      const source = root.dataset.subtitles;
-      if (!source) return;
-      try {
-        const response = await fetch(source);
-        if (!response.ok) throw new Error();
-        cues = parseSrt(await response.text());
-      } catch {
-        statusElement.textContent = 'Los subtítulos no pudieron cargarse.';
-      }
-    }
-
-    function animate() {
-      latitude = Math.max(-85, Math.min(85, latitude));
-      const phi = THREE.MathUtils.degToRad(90 - latitude);
-      const theta = THREE.MathUtils.degToRad(longitude);
-      camera.lookAt(
-        0.5 * Math.sin(phi) * Math.cos(theta),
-        0.5 * Math.cos(phi),
-        0.5 * Math.sin(phi) * Math.sin(theta),
-      );
-      updateInterface();
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-
-    new ResizeObserver(resize).observe(viewportElement);
-    loadSubtitles();
-    resize();
-    animate();
-  });
+  import { initPlayers } from "../lib/player";
+  initPlayers();
 </script>
+
+<style>
+  .player {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--player-background);
+    color: var(--paper);
+    isolation: isolate;
+  }
+  video,
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .player[data-projection="equirectangular"] video {
+    object-fit: cover;
+  }
+  video.canvas-video {
+    opacity: 0;
+  }
+  canvas {
+    touch-action: none;
+    cursor: grab;
+  }
+  .shade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--player-shade);
+  }
+  .round {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 4.25rem;
+    height: 4.25rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    font: bold 1.4rem/1 var(--font-controls);
+    text-decoration: none;
+  }
+  .round:focus-visible,
+  input:focus-visible,
+  .notice a:focus-visible {
+    outline: 3px solid var(--caption);
+    outline-offset: 4px;
+  }
+  .back {
+    position: absolute;
+    top: 1.8rem;
+    left: 1.8rem;
+  }
+  .round :global(svg) {
+    display: block;
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+  .small :global(svg) {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+  .round:disabled {
+    opacity: 0.65;
+    cursor: default;
+  }
+  .badge {
+    position: absolute;
+    top: 2.3rem;
+    right: 1.8rem;
+    color: var(--ink);
+    font: 700 1.1rem/1 var(--font-body, Georgia, serif);
+    background: color-mix(in srgb, var(--paper) 80%, transparent);
+    padding: 0.45rem 0.65rem;
+    border-radius: 2rem;
+  }
+  .hint {
+    position: absolute;
+    top: 5.5rem;
+    right: 1.8rem;
+    padding: 0.4rem 0.65rem;
+    background: var(--overlay);
+    font: 0.85rem var(--font-body, Georgia, serif);
+  }
+  .subtitle {
+    position: absolute;
+    bottom: 6rem;
+    left: 12%;
+    width: 76%;
+    color: var(--caption);
+    text-align: center;
+    white-space: pre-line;
+    text-shadow: var(--media-shadow);
+    font: bold clamp(1rem, 1.5vw, 1.6rem)/1.2 var(--font-body, Georgia, serif);
+    pointer-events: none;
+  }
+  .controls {
+    position: absolute;
+    bottom: 1.8rem;
+    left: 1.8rem;
+    right: 1.8rem;
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+  output {
+    font: 0.85rem var(--font-controls);
+    text-shadow: var(--media-shadow);
+  }
+  .spacer {
+    flex: 1;
+  }
+  .small {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 0.95rem;
+  }
+  input[type="range"] {
+    display: block;
+    width: 100%;
+    height: 1.5rem;
+    margin: 0;
+    border: 0;
+    appearance: none;
+    cursor: pointer;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 0.7rem;
+    border-radius: 1rem;
+    background: linear-gradient(
+      to right,
+      var(--progress) var(--progress, 0%),
+      var(--paper) var(--progress, 0%)
+    );
+  }
+  input[type="range"]::-moz-range-track {
+    height: 0.7rem;
+    border-radius: 1rem;
+    background: linear-gradient(
+      to right,
+      var(--progress) var(--progress, 0%),
+      var(--paper) var(--progress, 0%)
+    );
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: -0.25rem;
+    border-radius: 50%;
+    background: var(--progress);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--progress);
+  }
+  .notice {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 1.25rem;
+    background: var(--overlay-strong);
+    font: 1rem var(--font-body, Georgia, serif);
+  }
+  .notice button,
+  .notice a {
+    color: var(--paper);
+    background: transparent;
+    border: 1px solid var(--paper);
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  @media (max-width: 600px) {
+    .back {
+      top: 1rem;
+      left: 1rem;
+      font-size: 2.4rem;
+    }
+    .badge {
+      top: 1rem;
+      right: 1rem;
+    }
+    .round {
+      width: 3.25rem;
+      height: 3.25rem;
+    }
+    .controls {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1.2rem;
+    }
+    .actions {
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+    .small {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+    .subtitle {
+      bottom: 5.5rem;
+      left: 5%;
+      width: 90%;
+    }
+  }
+</style>

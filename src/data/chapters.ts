@@ -1,4 +1,4 @@
-export type AudioMode = 'integrated' | 'separate';
+import { asset } from "../lib/paths";
 
 export interface Chapter {
   slug: string;
@@ -6,62 +6,51 @@ export interface Chapter {
   title: string;
   summary: string;
   videoSrc: string;
+  posterSrc: string;
+  durationLabel: string;
+  projection: "flat" | "equirectangular";
+  hasAudio: boolean;
+  isPreview: boolean;
   audioSrc?: string;
-  subtitlesSrc: string;
-  audioMode: AudioMode;
-  loopVideo: boolean;
+  subtitlesSrc?: string;
+  loopVideo?: boolean;
 }
 
-// Medios provisionales. Cambiar estas rutas no requiere tocar el reproductor.
-const DEMO_VIDEO = 'https://threejs.org/examples/textures/pano.mp4';
-const DEMO_AUDIO =
-  'https://raw.githubusercontent.com/juanfuent-es/audio-subtitles-generator/main/demo.mp3';
-const DEMO_SUBTITLES = '/subtitles/demo.srt';
-
-export const titleShader = {
-  amplitude: 0.018,
-  frequency: 9,
-  speed: 0.8,
-  noiseScale: 3.2,
-  mouseInfluence: 0.012,
+// Replace these shared preview media with the final episodes when available.
+const preview = {
+  videoSrc: asset("media/video/episode-demo.mp4"),
+  durationLabel: "2:00 min",
+  projection: "equirectangular" as const,
+  hasAudio: false,
+  isPreview: true,
 };
 
 export const chapters: Chapter[] = [
   {
-    slug: 'lo-que-imaginamos',
-    number: '01',
-    title: 'Lo que imaginamos',
-    summary: 'Una primera aproximación a las imágenes que construimos alrededor del depredador.',
-    videoSrc: DEMO_VIDEO,
-    audioSrc: DEMO_AUDIO,
-    subtitlesSrc: DEMO_SUBTITLES,
-    audioMode: 'separate',
-    loopVideo: true,
+    ...preview,
+    slug: "ventral-body-upward-movement",
+    number: "1",
+    title: "Ventral Body Upward Movement",
+    summary:
+      "Una buza descubre que los tiburones utilizan ciertos movimientos para reconocerse y comunicarse en puntos específicos del arrecife, convirtiéndolos en espacios de encuentro y reconocimiento social.",
+    posterSrc: asset("media/images/episode-1.webp"),
   },
   {
-    slug: 'bajo-la-superficie',
-    number: '02',
-    title: 'Bajo la superficie',
-    summary: 'Un recorrido provisional por el espacio, el sonido y la observación.',
-    videoSrc: DEMO_VIDEO,
-    audioSrc: DEMO_AUDIO,
-    subtitlesSrc: DEMO_SUBTITLES,
-    audioMode: 'separate',
-    loopVideo: true,
+    ...preview,
+    slug: "tail-slap",
+    number: "2",
+    title: "Tail Slap",
+    summary:
+      "Una buza descubre que los tiburones blancos utilizan los golpes de sus aletas para comunicarse, coordinarse y compartir el alimento, revelando una forma de inteligencia colectiva basada en acuerdos y cooperación, más que en la competencia.",
+    posterSrc: asset("media/images/episode-2.webp"),
   },
   {
-    slug: 'otras-formas-de-mirar',
-    number: '03',
-    title: 'Otras formas de mirar',
-    summary: 'El cierre de la serie propone volver a mirar lo que creíamos reconocer.',
-    videoSrc: DEMO_VIDEO,
-    audioSrc: DEMO_AUDIO,
-    subtitlesSrc: DEMO_SUBTITLES,
-    audioMode: 'separate',
-    loopVideo: true,
+    ...preview,
+    slug: "ampollas-de-lorenzini",
+    number: "3",
+    title: "Ampollas de Lorenzini",
+    summary:
+      "Una buza observa cómo los tiburones utilizan sus ampollas de Lorenzini para explorar las jaulas de buceo y descubre que, lejos de actuar por instinto, investigan lo desconocido y comparten información para comprenderlo colectivamente.",
+    posterSrc: asset("media/images/episode-3.webp"),
   },
 ];
-
-export function getChapter(slug: string) {
-  return chapters.find((chapter) => chapter.slug === slug);
-}

@@ -1,0 +1,26 @@
+---
+import Brand from "./Brand.astro";
+import Icon from "./Icon.astro";
+import { asset } from "../lib/paths";
+interface Props {
+  active?: "series" | "typography";
+}
+const { active } = Astro.props;
+---
+
+<nav class="hero__nav" aria-label="Principal">
+  <Brand />
+  <div class="hero__links">
+    <a
+      class="hero__nav-link"
+      href={`${asset("")}#episodios`}
+      aria-current={active === "series" ? "page" : undefined}
+      >Episodios <Icon name="down" /></a
+    >
+    <a
+      class="hero__nav-link"
+      href={asset("tipografia/")}
+      aria-current={active === "typography" ? "page" : undefined}>Tipografía</a
+    >
+  </div>
+</nav>

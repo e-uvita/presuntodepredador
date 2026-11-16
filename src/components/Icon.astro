@@ -1,0 +1,42 @@
+---
+interface Props {
+  name:
+    | "play"
+    | "pause"
+    | "sound"
+    | "muted"
+    | "arrow"
+    | "back"
+    | "fullscreen"
+    | "down";
+}
+const { name } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 32 32"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  {
+    name === "play" && (
+      <path d="m12 7 14 9-14 9Z" fill="currentColor" stroke="none" />
+    )
+  }
+  {name === "pause" && <path d="M11 8v16M21 8v16" stroke-width="5" />}
+  {
+    (name === "sound" || name === "muted") && (
+      <path d="M5 12h5l7-6v20l-7-6H5Z" fill="currentColor" stroke="none" />
+    )
+  }
+  {name === "sound" && <path d="M22 10a9 9 0 0 1 0 12M26 6a15 15 0 0 1 0 20" />}
+  {name === "muted" && <path d="m23 12 7 8m0-8-7 8" />}
+  {name === "arrow" && <path d="M6 16h21m-8-8 8 8-8 8" />}
+  {name === "back" && <path d="M26 16H5m8-8-8 8 8 8" />}
+  {name === "fullscreen" && <path d="M12 5H5v7m15-7h7v7M5 20v7h7m8 0h7v-7" />}
+  {name === "down" && <path d="M16 5v22m-8-8 8 8 8-8" />}
+</svg>
