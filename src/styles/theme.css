@@ -1,0 +1,43 @@
+/* Edit the visual identity here. Layout and behavior live outside this file. */
+:root {
+  color-scheme: dark;
+
+  /* Main palette */
+  --ink: #17192d;
+  --paper: #ece9e5;
+  --muted: #c8d2e2;
+  --line: color-mix(in srgb, var(--paper) 44%, transparent);
+  --focus: #fff390;
+  --selection: #d0e6ff;
+  --caption: #ffe600;
+  --progress: #bd150e;
+
+  /* Fonts: declare local files in fonts.css, then use their family names here. */
+  --font-display: "alternate-gothic-atf", "Arial Narrow", Impact, sans-serif;
+  --font-body: "lexia-mono-variable", Georgia, serif;
+  --font-controls: system-ui, sans-serif;
+
+  /* Ocean gradient and media surfaces */
+  --ocean-shallow: #5073aa;
+  --ocean-middle: #3d5781;
+  --ocean-deep: #283754;
+  --hero-background: #0633a6;
+  --hero-shade: linear-gradient(
+    180deg,
+    rgb(6 28 88 / 2%) 0%,
+    rgb(8 23 66 / 2%) 34%,
+    rgb(9 10 38 / 38%) 65%,
+    #12121d 100%
+  );
+  --player-background: #07154c;
+  --player-shade: linear-gradient(transparent 58%, rgb(0 0 35 / 45%));
+  --media-placeholder: #0e304b;
+  --overlay: rgb(0 0 0 / 55%);
+  --overlay-strong: rgb(0 0 0 / 75%);
+  --media-shadow: 0 1px 4px #000;
+
+  /* Shared dimensions */
+  --content-width: 1600px;
+  --radius-card: 1.4rem;
+  --radius-image: 1rem;
+}

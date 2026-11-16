@@ -1,0 +1,17 @@
+/* Add licensed font files under public/fonts/ and declare their families here.
+   Paths are relative to this stylesheet so Astro handles the Pages base.
+
+   Example after adding public/fonts/mi-fuente.woff2:
+
+   @font-face {
+     font-family: "Mi Fuente";
+     src: url("../../public/fonts/mi-fuente.woff2") format("woff2");
+     font-style: normal;
+     font-weight: 400;
+     font-display: swap;
+   }
+
+   Use "Mi Fuente" in theme.css for the UI and/or data/typefaces.ts for specimens.
+   For a variable font, declare its actual weight range, e.g. 100 900.
+   The current Adobe kit is configured in config/site.ts; no font files are bundled.
+*/

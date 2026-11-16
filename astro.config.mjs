@@ -1,5 +1,8 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  output: 'static',
+  output: "static",
+  base: "/presuntodepredador",
+  trailingSlash: "always",
+  devToolbar: { enabled: false },
 });
