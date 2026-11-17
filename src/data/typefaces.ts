@@ -7,7 +7,7 @@ export interface Typeface {
 }
 
 export const specimen = {
-  text: "Quizá Hollywood juzgue al tiburón por sus fauces, mientras el hombre oculta su violencia bajo un extraño guion y un marketing que vende.",
+  text:"QUIZÁ HOLLYWOOD JUZGUE AL TIBURÓN POR SUS FAUCES, MIENTRAS EL HOMBRE OCULTA SU VIOLENCIA BAJO UN EXTRAÑO GUITAR Y UN MARKETING QUE VENDE.",
   size: 64,
   minSize: 24,
   maxSize: 160,
