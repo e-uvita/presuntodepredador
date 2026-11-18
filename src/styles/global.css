@@ -9,7 +9,8 @@ html {
 }
 body {
   margin: 0;
-  font: 400 1rem/1.55 var(--font-body);
+  /* Tamaño base del texto general del sitio. */
+  font: 400 var(--text-base)/1.55 var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 a {
@@ -66,9 +67,11 @@ h3 {
   text-transform: uppercase;
 }
 h2 {
+  /* Títulos de sección, como «Sinopsis» y «Episodios». */
   font-size: clamp(1.9rem, 2.5vw, 2.8rem);
 }
 h3 {
+  /* Títulos de las tarjetas de episodios. */
   font-size: clamp(1.6rem, 2.1vw, 2.5rem);
 }
 .sr-only {
@@ -102,7 +105,8 @@ h3 {
   margin-inline: auto;
 }
 .eyebrow {
-  font: 400 0.7rem/1.5 var(--font-body);
+  /* Etiquetas pequeñas superiores, como año y número de episodio. */
+  font: 400 var(--text-sm)/1.5 var(--font-body);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -165,7 +169,8 @@ h3 {
   align-items: center;
   gap: 0.8rem;
   padding: 0.65rem 0.25rem;
-  font-size: 0.65rem;
+  /* Enlaces «Episodios» y «Tipografía» de la navegación del hero. */
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   text-decoration: none;
@@ -221,6 +226,7 @@ h3 {
 .hero__tagline {
   margin-top: 1.4rem;
   margin-left: 2.7%;
+  /* Tagline bajo el título principal del hero. */
   font-size: clamp(0.7rem, 0.95vw, 1rem);
   letter-spacing: 0.015em;
   text-shadow: 0 1px 10px var(--overlay);
@@ -249,6 +255,7 @@ h3 {
   border-radius: 0.8rem;
   text-decoration: none;
   text-transform: uppercase;
+  /* Texto del botón «Ver episodio». */
   font: 700 clamp(1.5rem, 2.2vw, 2.3rem)/1 var(--font-display);
   transition:
     background 0.2s,
@@ -272,6 +279,7 @@ h3 {
   left: 8%;
   right: 8%;
   text-decoration: none;
+  /* Enlace inferior del hero, actualmente «Sinopsis». */
   font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -319,6 +327,7 @@ h3 {
   margin-bottom: 1.4rem;
 }
 .synopsis__text {
+  /* Párrafos de la sinopsis general. */
   font-size: clamp(0.9rem, 1vw, 1.125rem);
   line-height: 1.6;
 }
@@ -335,7 +344,8 @@ h3 {
   margin-bottom: 2.6rem;
 }
 .section-heading > span {
-  font-size: 0.7rem;
+  /* Contador de episodios junto al título de sección. */
+  font-size: var(--text-sm);
   letter-spacing: 0.12em;
   color: var(--muted);
 }
@@ -367,6 +377,7 @@ h3 {
   transform: translateY(-3px);
 }
 .chapter-card__number {
+  /* Número grande de cada tarjeta de episodio. */
   font: 700 clamp(2.2rem, 3vw, 3.5rem)/1 var(--font-display);
   text-align: center;
 }
@@ -410,6 +421,7 @@ h3 {
 }
 .chapter-card__copy p {
   max-width: 670px;
+  /* Sinopsis breve dentro de cada tarjeta de episodio. */
   font-size: clamp(0.75rem, 0.85vw, 0.95rem);
   line-height: 1.5;
 }
@@ -419,6 +431,7 @@ h3 {
 }
 .chapter-card__duration {
   white-space: nowrap;
+  /* Duración del episodio en su tarjeta. */
   font-size: clamp(0.85rem, 1.2vw, 1.3rem);
 }
 .chapter-card__arrow svg {
@@ -427,7 +440,8 @@ h3 {
 }
 .preview-note {
   margin-top: 1.4rem;
-  font-size: 0.7rem;
+  /* Aviso de que algunos episodios aún usan videos de muestra. */
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .credits {
@@ -441,13 +455,15 @@ h3 {
   min-height: 66px;
   cursor: pointer;
   list-style: none;
-  font: 700 1.4rem/1 var(--font-display);
+  /* Rótulo desplegable «Créditos». */
+  font: 700 var(--text-emphasis)/1 var(--font-display);
   text-transform: uppercase;
 }
 .credits summary::-webkit-details-marker {
   display: none;
 }
 .credits summary span {
+  /* Símbolo + que abre y cierra los créditos. */
   font: 400 1.5rem/1 var(--font-body);
   transition: transform 0.2s;
 }
@@ -462,7 +478,8 @@ h3 {
 }
 .credits dt {
   margin-bottom: 0.6rem;
-  font-size: 0.65rem;
+  /* Roles de los créditos: Voz, Escritura, Video, etc. */
+  font-size: var(--text-xs);
   color: var(--muted);
 }
 .credits dt strong {
@@ -470,14 +487,16 @@ h3 {
 }
 .credits dd {
   margin: 0;
-  font-size: 0.8rem;
+  /* Nombres de las personas o equipos en los créditos. */
+  font-size: var(--text-lg);
 }
 .footer {
   display: flex;
   align-items: center;
   gap: 0.7rem;
   padding-block: 3.5rem 2.5rem;
-  font-size: 0.65rem;
+  /* Nombre del proyecto y año en el pie de página. */
+  font-size: var(--text-xs);
 }
 .footer > span:first-child {
   text-transform: uppercase;
@@ -504,7 +523,8 @@ h3 {
   margin-top: 3rem;
   padding-top: 2rem;
   border-top: 1px solid var(--line);
-  font-size: 0.8rem;
+  /* Enlaces para volver a episodios o avanzar al siguiente. */
+  font-size: var(--text-lg);
 }
 .chapter-nav a {
   text-decoration: none;
@@ -541,7 +561,8 @@ h3 {
   .chapter-card__duration {
     grid-column: 3;
     margin-top: -1rem;
-    font-size: 0.75rem;
+    /* Duración en pantallas muy anchas. */
+    font-size: var(--text-md);
     color: var(--muted);
   }
   .chapter-card__image {
@@ -554,7 +575,8 @@ h3 {
     display: none;
   }
   .chapter-card__copy p {
-    font-size: 0.75rem;
+    /* Sinopsis breve de la tarjeta en pantallas muy anchas. */
+    font-size: var(--text-md);
   }
   .credits dl {
     grid-template-columns: repeat(2, 1fr);
@@ -576,7 +598,8 @@ h3 {
     height: 2.9rem;
   }
   .hero__nav-link {
-    font-size: 0.55rem;
+    /* Navegación del hero en celular. */
+    font-size: var(--text-2xs);
     gap: 0.4rem;
   }
   .hero__title {
@@ -587,19 +610,22 @@ h3 {
   .hero__tagline {
     margin: 1rem 8% 0;
     max-width: 260px;
-    font-size: 0.75rem;
+    /* Tagline del hero en celular. */
+    font-size: var(--text-md);
   }
   .hero__bottom {
     bottom: 17%;
   }
   .watch-button {
-    font-size: 1.65rem;
+    /* Botón «Ver episodio» en celular. */
+    font-size: var(--text-mobile-title);
     padding: 1rem 1.1rem;
     gap: 0.9rem;
     border-radius: 0.6rem;
   }
   .hero__scroll {
     bottom: 2rem;
+    /* Enlace inferior «Sinopsis» en celular. */
     font-size: 0.5rem;
     letter-spacing: 0.07em;
   }
@@ -607,11 +633,13 @@ h3 {
     padding-block: 3.5rem;
   }
   .synopsis .eyebrow {
-    font-size: 0.55rem;
+    /* Etiqueta de año y cantidad de episodios en celular. */
+    font-size: var(--text-2xs);
     letter-spacing: 0.09em;
   }
   .synopsis__text {
-    font-size: 0.85rem;
+    /* Párrafos de la sinopsis general en celular. */
+    font-size: var(--text-xl);
     line-height: 1.65;
   }
   .section-heading {
@@ -626,6 +654,7 @@ h3 {
   .chapter-card__number {
     grid-row: 1;
     align-self: end;
+    /* Número de episodio en celular. */
     font-size: 2rem;
   }
   .chapter-card__image {
@@ -637,25 +666,29 @@ h3 {
     grid-column: 1 / -1;
   }
   .chapter-card__copy h3 {
-    font-size: 1.65rem;
+    /* Título de cada episodio en celular. */
+    font-size: var(--text-mobile-title);
     line-height: 1.1;
     margin-bottom: 0.7rem;
   }
   .chapter-card__copy p {
-    font-size: 0.75rem;
+    /* Sinopsis breve de episodio en celular. */
+    font-size: var(--text-md);
     line-height: 1.6;
   }
   .chapter-card__duration {
     grid-column: 1 / -1;
     margin-top: 0;
-    font-size: 0.7rem;
+    /* Duración del episodio en celular. */
+    font-size: var(--text-sm);
   }
   .chapter-card__play {
     width: 2.9rem;
     height: 2.9rem;
   }
   .preview-note {
-    font-size: 0.65rem;
+    /* Aviso de videos de muestra en celular. */
+    font-size: var(--text-xs);
   }
   .credits {
     margin-top: 2.5rem;
@@ -667,7 +700,8 @@ h3 {
   .footer {
     flex-wrap: wrap;
     padding-block: 2rem;
-    font-size: 0.55rem;
+    /* Nombre del proyecto y año en el pie, en celular. */
+    font-size: var(--text-2xs);
   }
   .footer a {
     flex-basis: 100%;
@@ -686,7 +720,8 @@ h3 {
     width: 47%;
   }
   .hero__tagline {
-    font-size: 0.65rem;
+    /* Tagline del hero en pantallas apaisadas y bajas. */
+    font-size: var(--text-xs);
     margin-top: 0.25rem;
   }
   .hero__bottom {
