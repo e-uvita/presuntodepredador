@@ -31,6 +31,8 @@ export function initPlayers() {
       let startRendering = () => {};
       let stopRendering = () => {};
       video.controls = false;
+      video.playsInline = true;
+      if (!hasAudio) video.muted = true;
       controls.hidden = false;
       video.loop = root.dataset.loop === "true";
       if (separate) {
@@ -121,6 +123,9 @@ export function initPlayers() {
         update();
       };
       play.addEventListener("click", toggle);
+      // Mobile browsers wait for a direct user gesture before loading and
+      // playing video. Keep the video tappable when WebGL falls back.
+      video.addEventListener("click", () => void toggle());
       mute.addEventListener("click", () => {
         if (!hasAudio) return;
         master.muted = !master.muted;
@@ -268,6 +273,7 @@ export function initPlayers() {
             let contextAvailable = true;
             let pointer:
               { x: number; y: number; lon: number; lat: number } | undefined;
+            let dragged = false;
             const render = () => {
               const phi = THREE.MathUtils.degToRad(90 - latitude);
               const theta = THREE.MathUtils.degToRad(longitude);
@@ -358,6 +364,7 @@ export function initPlayers() {
               if (!master.paused) startRendering();
             });
             canvas.addEventListener("pointerdown", (event) => {
+              dragged = false;
               pointer = {
                 x: event.clientX,
                 y: event.clientY,
@@ -368,6 +375,11 @@ export function initPlayers() {
             });
             canvas.addEventListener("pointermove", (event) => {
               if (!pointer) return;
+              if (
+                Math.abs(pointer.x - event.clientX) > 8 ||
+                Math.abs(pointer.y - event.clientY) > 8
+              )
+                dragged = true;
               longitude = pointer.lon + (pointer.x - event.clientX) * 0.12;
               latitude = Math.max(
                 -85,
@@ -380,6 +392,12 @@ export function initPlayers() {
             });
             canvas.addEventListener("pointercancel", () => {
               pointer = undefined;
+            });
+            // Once the panorama canvas covers the video, a tap on it should
+            // still start or pause playback. A drag remains camera movement.
+            canvas.addEventListener("click", () => {
+              if (dragged) return;
+              void toggle();
             });
             root.addEventListener(
               "keydown",

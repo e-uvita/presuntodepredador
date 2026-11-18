@@ -29,8 +29,9 @@ const {
     src={chapter.videoSrc}
     poster={chapter.posterSrc}
     playsinline
+    webkit-playsinline
     preload="metadata"
-    controls
+    autoplay
     aria-label={`Video: ${chapter.title}`}></video>
   <canvas hidden aria-hidden="true"></canvas>
   <audio hidden preload="metadata"></audio>
