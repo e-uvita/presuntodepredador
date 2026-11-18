@@ -20,7 +20,7 @@ const next = chapters[index + 1];
 
 <BaseLayout
   title={`${chapter.title} — ${site.name}`}
-  description={chapter.summary}
+  description={chapter.summary.replace(/<[^>]*>/g, "")}
 >
   <main id="contenido" class="chapter-detail">
     <h1 class="sr-only">Episodio {chapter.number}: {chapter.title}</h1>
@@ -36,7 +36,7 @@ const next = chapters[index + 1];
         }
       </p>
       <h2 id="episode-title">{chapter.title}</h2>
-      <p>{chapter.summary}</p>
+      <p set:html={chapter.summary}></p>
       <nav class="chapter-nav" aria-label="Navegación entre episodios">
         <a href={`${asset("")}#episodios`}>← Todos los episodios</a>
         {next && <a href={chapterHref(next.slug)}>Siguiente: {next.title} →</a>}

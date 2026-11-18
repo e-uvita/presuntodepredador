@@ -1,7 +1,6 @@
 import { initWaterTitle } from "./water-title";
 
 export function initHero(root: HTMLElement) {
-  const button = root.querySelector<HTMLButtonElement>("[data-motion]")!;
   const title = root.querySelector<HTMLElement>("[data-water-title]")!;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const connection = (
@@ -13,8 +12,6 @@ export function initHero(root: HTMLElement) {
   let previous = 0;
   let time = 0;
   let water: ReturnType<typeof initWaterTitle> | undefined;
-
-  root.querySelector<HTMLElement>("[data-hero-tools]")!.hidden = false;
 
   function animate(now: number) {
     if (now - previous >= 1000 / 30) {
@@ -28,13 +25,6 @@ export function initHero(root: HTMLElement) {
   function update() {
     cancelAnimationFrame(frame);
     frame = 0;
-    button.setAttribute(
-      "aria-label",
-      paused ? "Reanudar animación" : "Pausar animación",
-    );
-    button.setAttribute("aria-pressed", String(paused));
-    button.querySelector<HTMLElement>("[data-pause-icon]")!.hidden = paused;
-    button.querySelector<HTMLElement>("[data-play-icon]")!.hidden = !paused;
     if (paused || !visible || document.hidden) {
       return;
     }
@@ -48,10 +38,6 @@ export function initHero(root: HTMLElement) {
     update();
   });
   observer.observe(root);
-  button.addEventListener("click", () => {
-    paused = !paused;
-    update();
-  });
   const preferenceChanged = () => {
     paused = reduceMotion.matches;
     update();

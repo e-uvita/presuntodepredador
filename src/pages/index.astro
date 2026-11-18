@@ -28,7 +28,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
       <div class="hero__title">
         <h1 class="sr-only">{site.name}</h1>
         <WaterTitle />
-        <p class="hero__tagline">{site.tagline}</p>
+        <p class="hero__tagline" set:html={site.tagline}></p>
       </div>
       <div class="hero__bottom">
         {
@@ -38,22 +38,9 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
             </a>
           )
         }
-        <div class="hero__tools" hidden data-hero-tools>
-          <button
-            class="round-button"
-            type="button"
-            data-motion
-            aria-label="Pausar animación"
-            aria-pressed="false"
-            ><span data-pause-icon><Icon name="pause" /></span><span
-              data-play-icon
-              hidden><Icon name="play" /></span
-            ></button
-          >
-        </div>
       </div>
       <a class="hero__scroll" href="#sinopsis" aria-label="Leer sinopsis"
-        ><span>Episodios</span><Icon name="down" /></a
+        ><span>Sinopsis</span><Icon name="down" /></a
       >
     </header>
 
@@ -67,7 +54,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
           <p class="eyebrow">{site.year} · {chapters.length} episodios</p>
           <h2 id="synopsis-title">Sinopsis</h2>
           <div class="synopsis__text">
-            {synopsis.map((paragraph) => <p>{paragraph}</p>)}
+            {synopsis.map((paragraph) => <p set:html={paragraph} />)}
           </div>
         </section>
         <section
@@ -84,11 +71,11 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
             {chapters.map((chapter) => <ChapterCard chapter={chapter} />)}
           </ol>
           {
-            hasPreviews && (
-              <p class="preview-note">
-                Algunos episodios incluyen por ahora un video de muestra.
-              </p>
-            )
+            // hasPreviews && (
+            //   <p class="preview-note">
+            //     Algunos episodios incluyen por ahora un video de muestra.
+            //   </p>
+            // )
           }
         </section>
         <details class="credits">
@@ -98,7 +85,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
               credits.map(([role, name]) => (
                 <div>
                   <>
-                    <dt>{role}</dt>
+                    <dt set:html={role} />
                     <dd>{name}</dd>
                   </>
                 </div>

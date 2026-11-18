@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 386.4130737633 386.4130737633">
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 386.4130737633 386.4130737633" style="background: transparent">
   <defs>
     <style>
       .cls-1 {
         fill: #ece7e7;
+        transition: fill 0.2s;
       }
 
       .cls-2 {
         fill: #171931;
+        transition: fill 0.2s;
+      }
+
+      svg:hover .cls-1 {
+        fill: #a70000;
+      }
+
+      svg:hover .cls-2 {
+        fill: #ece9e5;
       }
     </style>
   </defs>

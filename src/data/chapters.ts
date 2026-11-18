@@ -32,7 +32,7 @@ export const chapters: Chapter[] = [
     number: "1",
     title: "Ventral Body Upward Movement",
     summary:
-      "Una buza descubre que los tiburones utilizan ciertos movimientos para reconocerse y comunicarse en puntos específicos del arrecife, convirtiéndolos en espacios de encuentro y reconocimiento social.",
+      "Una <em>buza</em> descubre que los tiburones utilizan ciertos movimientos para <strong>reconocerse y comunicarse</strong> en puntos específicos del arrecife, convirtiéndolos en espacios de <strong>encuentro y reconocimiento social</strong>.",
     posterSrc: asset("media/images/episode-1.webp"),
   },
   {
@@ -41,7 +41,7 @@ export const chapters: Chapter[] = [
     number: "2",
     title: "Tail Slap",
     summary:
-      "Una buza descubre que los tiburones blancos utilizan los golpes de sus aletas para comunicarse, coordinarse y compartir el alimento, revelando una forma de inteligencia colectiva basada en acuerdos y cooperación, más que en la competencia.",
+      "Una <em>buza</em> descubre que los tiburones blancos utilizan los golpes de sus aletas para comunicarse, coordinarse y compartir el alimento, revelando una forma de inteligencia colectiva basada en acuerdos y cooperación, más que en la competencia.",
     posterSrc: asset("media/images/episode-2.webp"),
   },
   {
@@ -50,7 +50,7 @@ export const chapters: Chapter[] = [
     number: "3",
     title: "Ampollas de Lorenzini",
     summary:
-      "Una buza observa cómo los tiburones utilizan sus ampollas de Lorenzini para explorar las jaulas de buceo y descubre que, lejos de actuar por instinto, investigan lo desconocido y comparten información para comprenderlo colectivamente.",
+      "Una <em>buza</em> observa cómo los tiburones utilizan sus ampollas de Lorenzini para explorar las jaulas de buceo y descubre que, lejos de actuar por instinto, investigan lo desconocido y comparten información para comprenderlo colectivamente.",
     posterSrc: asset("media/images/episode-3.webp"),
   },
 ];

@@ -2,15 +2,16 @@
 :root {
   color-scheme: dark;
 
-  /* Main palette */
-  --ink: #17192d;
-  --paper: #ece9e5;
-  --muted: #c8d2e2;
-  --line: color-mix(in srgb, var(--paper) 44%, transparent);
-  --focus: #fff390;
-  --selection: #d0e6ff;
-  --caption: #ffe600;
-  --progress: #bd150e;
+  /* Paleta principal: fondos, texto, bordes y resaltados accesibles. */
+  --ink: #141930; /* Base oscura: fondo de página, final de gradientes y texto en controles claros. */
+  --paper: #ece7e7; /* Tono claro: texto principal, botones, tarjetas y superficies de controles. */
+  --muted: #ece7e7; /* Texto secundario: sinopsis, metadatos y etiquetas de apoyo. */
+  --line: color-mix(in srgb, var(--paper) 44%, transparent); /* Bordes y separadores sutiles, derivados de paper. */
+  --focus: #fff390; /* Contorno de foco del teclado en elementos interactivos. */
+  --link-hover: #a70000; /* Rojo de texto para enlaces y botones de navegación al pasar el cursor. */
+  --selection: #d0e6ff; /* Fondo resaltado al seleccionar texto. */
+  --caption: #ffe600; /* Amarillo brillante para subtítulos y su contorno de foco en el video. */
+  --progress: #a70000; /* Relleno rojo de la línea de tiempo y el indicador de progreso del reproductor. */
 
   /* Fonts: declare local files in fonts.css, then use their family names here. */
   --font-display: "alternate-gothic-atf", "Arial Narrow", Impact, sans-serif;
@@ -18,10 +19,10 @@
   --font-controls: system-ui, sans-serif;
 
   /* Ocean gradient and media surfaces */
-  --ocean-shallow: #5073aa;
-  --ocean-middle: #3d5781;
-  --ocean-deep: #283754;
-  --hero-background: #0633a6;
+  --ocean-shallow: #1d4e9e; /* Azul más claro del gradiente oceánico de la sección de episodios. */
+  --ocean-middle: #0a2f80; /* Tono intermedio del gradiente oceánico de la sección de episodios. */
+  --ocean-deep: #141930; /* Tono oscuro antes de que el gradiente se funda con ink. */
+  --hero-background: #141930; /* Fondo de respaldo detrás de la imagen y el título del hero. */
   --hero-shade: linear-gradient(
     180deg,
     rgb(6 28 88 / 2%) 0%,
@@ -29,12 +30,12 @@
     rgb(9 10 38 / 38%) 65%,
     #12121d 100%
   );
-  --player-background: #07154c;
-  --player-shade: linear-gradient(transparent 58%, rgb(0 0 35 / 45%));
-  --media-placeholder: #0e304b;
-  --overlay: rgb(0 0 0 / 55%);
-  --overlay-strong: rgb(0 0 0 / 75%);
-  --media-shadow: 0 1px 4px #000;
+  --player-background: #141930; /* Fondo detrás del video panorámico y el canvas. */
+  --player-shade: linear-gradient(transparent 58%, rgb(0 0 35 / 45%)); /* Oscurece la parte inferior del video para hacer legibles los controles. */
+  --media-placeholder: #141930; /* Fondo provisional mientras no está disponible el medio o la imagen del episodio. */
+  --overlay: rgb(0 0 0 / 55%); /* Capa oscura intermedia para mejorar la lectura sobre imágenes. */
+  --overlay-strong: rgb(0 0 0 / 75%); /* Capa más oscura del panel expandido de controles del reproductor. */
+  --media-shadow: 0 1px 4px #000; /* Sombra detrás de subtítulos y etiquetas sobre el video. */
 
   /* Shared dimensions */
   --content-width: 1600px;

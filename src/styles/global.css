@@ -121,7 +121,8 @@ h3 {
     transform 0.2s;
 }
 .round-button:hover {
-  background: var(--paper);
+  background: var(--progress);
+  color: var(--paper);
   transform: scale(1.05);
 }
 .round-button svg {
@@ -168,11 +169,26 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   text-decoration: none;
-  text-shadow: 0 1px 12px var(--ink);
+  text-shadow: 0 2px 12px var(--ink);
+  transition: text-shadow 0.2s;
+}
+.hero__nav-link:hover {
+  text-shadow:
+    0 0 3px var(--link-hover),
+    0 0 12px var(--link-hover),
+    0 0 32px var(--link-hover),
+    0 0 48px color-mix(in srgb, var(--link-hover) 75%, transparent);
 }
 .hero__nav-link svg {
   width: 1rem;
   height: 1rem;
+  transition: filter 0.2s;
+}
+.hero__nav-link:hover svg {
+  filter:
+    drop-shadow(0 0 3px var(--link-hover))
+    drop-shadow(0 0 12px var(--link-hover))
+    drop-shadow(0 0 24px var(--link-hover));
 }
 .hero__title {
   position: absolute;
@@ -204,10 +220,13 @@ h3 {
 }
 .hero__tagline {
   margin-top: 1.4rem;
-  margin-left: 5.5%;
+  margin-left: 2.7%;
   font-size: clamp(0.7rem, 0.95vw, 1rem);
   letter-spacing: 0.015em;
   text-shadow: 0 1px 10px var(--overlay);
+}
+.hero__tagline strong {
+  font-weight: 800;
 }
 .hero__bottom {
   position: absolute;
@@ -226,7 +245,7 @@ h3 {
   padding: 1.15rem 1.5rem;
   background: var(--paper);
   color: var(--ink);
-  border: 1px solid var(--paper);
+  border: 0;
   border-radius: 0.8rem;
   text-decoration: none;
   text-transform: uppercase;
@@ -240,7 +259,8 @@ h3 {
   height: 1.3rem;
 }
 .watch-button:hover {
-  background: var(--paper);
+  background: var(--progress);
+  color: var(--paper);
   transform: translateY(-3px);
 }
 .hero__scroll {
@@ -256,10 +276,26 @@ h3 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
+  transition: text-shadow 0.2s;
 }
 .hero__scroll svg {
   width: 1rem;
   height: 1rem;
+  transition: filter 0.2s;
+}
+.hero__scroll:hover,
+.footer a:hover {
+  text-shadow:
+    0 0 3px var(--link-hover),
+    0 0 12px var(--link-hover),
+    0 0 32px var(--link-hover),
+    0 0 48px color-mix(in srgb, var(--link-hover) 75%, transparent);
+}
+.hero__scroll:hover svg {
+  filter:
+    drop-shadow(0 0 3px var(--link-hover))
+    drop-shadow(0 0 12px var(--link-hover))
+    drop-shadow(0 0 24px var(--link-hover));
 }
 
 .ocean-content {
@@ -285,6 +321,9 @@ h3 {
 .synopsis__text {
   font-size: clamp(0.9rem, 1vw, 1.125rem);
   line-height: 1.6;
+}
+.synopsis__text strong {
+  font-weight: 800;
 }
 .synopsis__text p + p {
   margin-top: 1rem;
@@ -323,8 +362,8 @@ h3 {
     transform 0.25s;
 }
 .chapter-card:hover {
-  border-color: var(--paper);
-  background: color-mix(in srgb, var(--paper) 7%, transparent);
+  border-color: color-mix(in srgb, var(--progress) 65%, transparent);
+  background: color-mix(in srgb, var(--progress) 22%, transparent);
   transform: translateY(-3px);
 }
 .chapter-card__number {
@@ -364,7 +403,7 @@ h3 {
   transform: scale(1.04);
 }
 .chapter-card:hover .chapter-card__play {
-  background: color-mix(in srgb, var(--ink) 65%, transparent);
+  background: color-mix(in srgb, var(--progress) 72%, transparent);
 }
 .chapter-card__copy h3 {
   margin-bottom: 0.7rem;
@@ -373,6 +412,10 @@ h3 {
   max-width: 670px;
   font-size: clamp(0.75rem, 0.85vw, 0.95rem);
   line-height: 1.5;
+}
+.chapter-card__copy strong,
+.episode-info > p strong {
+  font-weight: 800;
 }
 .chapter-card__duration {
   white-space: nowrap;
@@ -422,6 +465,9 @@ h3 {
   font-size: 0.65rem;
   color: var(--muted);
 }
+.credits dt strong {
+  font-weight: 800;
+}
 .credits dd {
   margin: 0;
   font-size: 0.8rem;
@@ -440,6 +486,7 @@ h3 {
   margin-left: auto;
   text-decoration: none;
   color: var(--muted);
+  transition: text-shadow 0.2s;
 }
 .episode-info {
   padding-block: 4rem;
@@ -665,9 +712,18 @@ h3 {
   display: flex;
   gap: clamp(0.75rem, 2vw, 2rem);
 }
-.brand img {
+.brand__mark,
+.brand__mark svg {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+}
+.brand__mark svg {
+  overflow: visible;
+}
+.brand:hover .brand__mark .cls-1 {
+  fill: var(--progress);
+}
+.brand:hover .brand__mark .cls-2 {
+  fill: var(--paper);
 }

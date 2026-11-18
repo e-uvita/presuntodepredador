@@ -8,7 +8,7 @@ interface Props {
   description?: string;
 }
 const {
-  title = `${site.name} — ${site.tagline}`,
+  title = `${site.name} — ${site.tagline.replace(/<[^>]*>/g, "")}`,
   description = site.description,
 } = Astro.props;
 ---

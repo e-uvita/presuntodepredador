@@ -1,6 +1,11 @@
 ---
+import { readFileSync } from "node:fs";
 import { site } from "../config/site";
 import { asset } from "../lib/paths";
+const markSvg = readFileSync(
+  new URL("../../public/branding/mark.svg", import.meta.url),
+  "utf8",
+).replace(/^<\?xml[^>]*\?>\s*/, "");
 ---
 
 <a
@@ -8,5 +13,5 @@ import { asset } from "../lib/paths";
   href={asset("")}
   aria-label={`${site.name}, inicio`}
 >
-  <img src={site.branding.mark} width="36" height="36" alt="" />
+  <span class="brand__mark" aria-hidden="true" set:html={markSvg}></span>
 </a>

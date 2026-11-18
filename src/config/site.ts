@@ -3,7 +3,7 @@ import { asset } from "../lib/paths";
 /** Site identity and shared assets. Keep episode-specific media in chapters.ts. */
 export const site = {
   name: "Presunto depredador",
-  tagline: "El tiburón que existe y el que imaginamos.",
+  tagline: "El tiburón que <strong>existe</strong> y el que <strong>imaginamos</strong>.",
   year: 2026,
   description:
     "Tres narraciones desde el océano que cuestionan nuestra forma de mirar a los tiburones. Un proyecto de Elizabeth Lezama Jacinto.",

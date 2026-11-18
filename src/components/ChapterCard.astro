@@ -26,7 +26,7 @@ const { chapter } = Astro.props;
     <div class="chapter-card__copy">
       <span class="sr-only">Episodio {chapter.number}: </span>
       <h3>{chapter.title}</h3>
-      <p>{chapter.summary}</p>
+      <p set:html={chapter.summary}></p>
     </div>
     <span class="chapter-card__duration">{chapter.durationLabel}</span>
     <span class="chapter-card__arrow"><Icon name="arrow" /></span>
