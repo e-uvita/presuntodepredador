@@ -1,9 +1,10 @@
 ---
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { site } from "../config/site";
 import { asset } from "../lib/paths";
 const markSvg = readFileSync(
-  new URL("../../public/branding/mark.svg", import.meta.url),
+  resolve(process.cwd(), "public/branding/mark.svg"),
   "utf8",
 ).replace(/^<\?xml[^>]*\?>\s*/, "");
 ---
