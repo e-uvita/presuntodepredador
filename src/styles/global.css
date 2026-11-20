@@ -603,8 +603,9 @@ h3 {
     gap: 0.4rem;
   }
   .hero__title {
-    left: 2%;
-    width: 96%;
+    left: 2vw;
+    width: 96vw;
+    max-width: none;
     top: 32%;
   }
   .hero__tagline {
