@@ -38,15 +38,32 @@
   --media-shadow: 0 1px 4px #000; /* Sombra detrás de subtítulos y etiquetas sobre el video. */
 
   /* Tamaños repetidos: al cambiar uno, se actualizan todos sus usos. */
-  --text-2xs: 0.55rem; /* En móvil: botones «Episodios» y «Tipografía», enlace «Sinopsis» y pie de página. */
-  --text-xs: 0.65rem; /* En escritorio: botones «Episodios» y «Tipografía», roles de créditos y etiquetas pequeñas. */
-  --text-sm: 0.7rem; /* Año y número de episodios, contadores y aviso de videos de muestra. */
-  --text-md: 0.75rem; /* Descripciones y duración en las tarjetas de episodios. */
-  --text-lg: 0.8rem; /* Nombres en créditos, enlaces entre episodios y controles de tipografía. */
-  --text-xl: 0.85rem; /* Sinopsis en móvil y etiquetas pequeñas del reproductor. */
-  --text-base: 1rem; /* Texto general del sitio y avisos del reproductor. */
-  --text-emphasis: 1.4rem; /* Título «Créditos» y control redondo principal del reproductor. */
-  --text-mobile-title: 1.65rem; /* En móvil: botón «Ver episodio» y títulos de las tarjetas. */
+  --text-2xs: 0.65rem; /* Móvil: botones «Episodios» y «Tipografía», enlace «Sinopsis» y pie de página. */
+  --text-xs: 0.8rem; /* Móvil y escritorio: botones «Episodios» y «Tipografía», roles de créditos y etiquetas pequeñas. */
+  --text-sm: 0.8rem; /* Móvil y escritorio: año, número de episodios, contadores y aviso de videos de muestra. */
+  --text-md: 0.8rem; /* Móvil y escritorio: descripciones y duración en las tarjetas de episodios. */
+  --text-lg: 0.8rem; /* Móvil y escritorio: nombres en créditos, enlaces entre episodios y controles de tipografía. */
+  --text-xl: 1rem; /* Móvil y escritorio: sinopsis en móvil y etiquetas pequeñas del reproductor. */
+  --text-base: 1rem; /* Móvil y escritorio: texto general del sitio y avisos del reproductor. */
+  --text-emphasis: 1.4rem; /* Móvil y escritorio: título «Créditos» y control redondo principal del reproductor. */
+  --text-mobile-title: 1.65rem; /* Móvil: botón «Ver episodio» y títulos de las tarjetas. */
+  --text-section-heading: clamp(1.9rem, 2.5vw, 2.8rem); /* Adaptable a móvil y escritorio: títulos «Sinopsis» y «Episodios». */
+  --text-episode-heading: clamp(1.6rem, 2.1vw, 2.5rem); /* Adaptable a móvil y escritorio: títulos de las tarjetas de episodios. */
+  --text-typography-heading: clamp(3rem, 9vw, 8rem); /* Adaptable a móvil y escritorio: título principal de «Tipografía». */
+  --text-hero-tagline: clamp(0.7rem, 0.95vw, 1rem); /* Adaptable a móvil y escritorio: frase «El tiburón que existe y el que imaginamos». */
+  --text-watch-button: clamp(1.5rem, 2.2vw, 2.3rem); /* Móvil y escritorio: botón «Ver episodio». */
+  --text-hero-scroll: 0.8rem; /* Escritorio: enlace «Sinopsis» al pie del hero. */
+  --text-hero-scroll-mobile: 0.65rem; /* Móvil: enlace «Sinopsis» al pie del hero. */
+  --text-synopsis: clamp(0.9rem, 1vw, 1.125rem); /* Adaptable a móvil y escritorio: párrafos de la sinopsis. */
+  --text-episode-number: clamp(2.2rem, 3vw, 3.5rem); /* Escritorio: número de episodio. */
+  --text-episode-summary: clamp(0.75rem, 0.85vw, 0.95rem); /* Móvil y escritorio: resumen de la tarjeta de episodio. */
+  --text-episode-duration: clamp(0.85rem, 1.2vw, 1.3rem); /* Móvil y escritorio: duración del episodio. */
+  --text-credits-toggle: 1.5rem; /* Móvil y escritorio: signo + para abrir y cerrar «Créditos». */
+  --text-mobile-episode-number: 2rem; /* Móvil: número de episodio. */
+  --text-player-badge: 1.1rem; /* Móvil y escritorio: número de episodio dentro del reproductor. */
+  --text-player-subtitle: clamp(1rem, 1.5vw, 1.6rem); /* Adaptable a móvil y escritorio: subtítulos sobre el video. */
+  --text-player-small-control: 0.95rem; /* Móvil y escritorio: texto del control pequeño del reproductor. */
+  --text-player-back: 2.4rem; /* Móvil: flecha para volver. */
 
   /* Shared dimensions */
   --content-width: 1600px;

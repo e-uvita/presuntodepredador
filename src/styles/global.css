@@ -68,11 +68,11 @@ h3 {
 }
 h2 {
   /* Títulos de sección, como «Sinopsis» y «Episodios». */
-  font-size: clamp(1.9rem, 2.5vw, 2.8rem);
+  font-size: var(--text-section-heading);
 }
 h3 {
   /* Títulos de las tarjetas de episodios. */
-  font-size: clamp(1.6rem, 2.1vw, 2.5rem);
+  font-size: var(--text-episode-heading);
 }
 .sr-only {
   position: absolute;
@@ -227,7 +227,7 @@ h3 {
   margin-top: 1.4rem;
   margin-left: 2.7%;
   /* Tagline bajo el título principal del hero. */
-  font-size: clamp(0.7rem, 0.95vw, 1rem);
+  font-size: var(--text-hero-tagline);
   letter-spacing: 0.015em;
   text-shadow: 0 1px 10px var(--overlay);
 }
@@ -256,7 +256,7 @@ h3 {
   text-decoration: none;
   text-transform: uppercase;
   /* Texto del botón «Ver episodio». */
-  font: 700 clamp(1.5rem, 2.2vw, 2.3rem)/1 var(--font-display);
+  font: 700 var(--text-watch-button)/1 var(--font-display);
   transition:
     background 0.2s,
     transform 0.2s;
@@ -280,7 +280,7 @@ h3 {
   right: 8%;
   text-decoration: none;
   /* Enlace inferior del hero, actualmente «Sinopsis». */
-  font-size: 0.6rem;
+  font-size: var(--text-hero-scroll);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
@@ -328,7 +328,7 @@ h3 {
 }
 .synopsis__text {
   /* Párrafos de la sinopsis general. */
-  font-size: clamp(0.9rem, 1vw, 1.125rem);
+  font-size: var(--text-synopsis);
   line-height: 1.6;
 }
 .synopsis__text strong {
@@ -378,7 +378,7 @@ h3 {
 }
 .chapter-card__number {
   /* Número grande de cada tarjeta de episodio. */
-  font: 700 clamp(2.2rem, 3vw, 3.5rem)/1 var(--font-display);
+  font: 700 var(--text-episode-number)/1 var(--font-display);
   text-align: center;
 }
 .chapter-card__image {
@@ -422,7 +422,7 @@ h3 {
 .chapter-card__copy p {
   max-width: 670px;
   /* Sinopsis breve dentro de cada tarjeta de episodio. */
-  font-size: clamp(0.75rem, 0.85vw, 0.95rem);
+  font-size: var(--text-episode-summary);
   line-height: 1.5;
 }
 .chapter-card__copy strong,
@@ -432,7 +432,7 @@ h3 {
 .chapter-card__duration {
   white-space: nowrap;
   /* Duración del episodio en su tarjeta. */
-  font-size: clamp(0.85rem, 1.2vw, 1.3rem);
+  font-size: var(--text-episode-duration);
 }
 .chapter-card__arrow svg {
   width: 1.2rem;
@@ -464,7 +464,7 @@ h3 {
 }
 .credits summary span {
   /* Símbolo + que abre y cierra los créditos. */
-  font: 400 1.5rem/1 var(--font-body);
+  font: 400 var(--text-credits-toggle)/1 var(--font-body);
   transition: transform 0.2s;
 }
 .credits[open] summary span {
@@ -626,7 +626,7 @@ h3 {
   .hero__scroll {
     bottom: 2rem;
     /* Enlace inferior «Sinopsis» en celular. */
-    font-size: 0.5rem;
+    font-size: var(--text-hero-scroll-mobile);
     letter-spacing: 0.07em;
   }
   .synopsis {
@@ -655,7 +655,7 @@ h3 {
     grid-row: 1;
     align-self: end;
     /* Número de episodio en celular. */
-    font-size: 2rem;
+    font-size: var(--text-mobile-episode-number);
   }
   .chapter-card__image {
     grid-column: 2 / -1;

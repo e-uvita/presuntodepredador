@@ -7,7 +7,7 @@
 }
 .typography-header h1 {
   margin-block: 1rem;
-  font: 700 clamp(3rem, 9vw, 8rem)/1 var(--font-display);
+  font: 700 var(--text-typography-heading)/1 var(--font-display);
   text-transform: uppercase;
 }
 .typography-header > p:last-child {
