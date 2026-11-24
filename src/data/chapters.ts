@@ -41,7 +41,7 @@ export const chapters: Chapter[] = [
     number: "2",
     title: "Tail Slap",
     summary:
-      "Una <em>buza</em> descubre que los tiburones blancos utilizan los golpes de sus aletas para comunicarse, coordinarse y compartir el alimento, revelando una forma de inteligencia colectiva basada en acuerdos y cooperación, más que en la competencia.",
+      "Una <em>buza</em> descubre que los tiburones blancos utilizan los golpes de sus aletas para <strong>comunicarse, coordinarse y compartir el alimento</strong>, revelando una forma de inteligencia colectiva basada en <strong>acuerdos y cooperación</strong>, más que en la competencia.",
     posterSrc: asset("media/images/episode-2.webp"),
   },
   {
@@ -50,7 +50,7 @@ export const chapters: Chapter[] = [
     number: "3",
     title: "Ampollas de Lorenzini",
     summary:
-      "Una <em>buza</em> observa cómo los tiburones utilizan sus ampollas de Lorenzini para explorar las jaulas de buceo y descubre que, lejos de actuar por instinto, investigan lo desconocido y comparten información para comprenderlo colectivamente.",
+      "Una <em>buza</em> observa cómo los tiburones utilizan sus <strong>ampollas de Lorenzini</strong> para explorar las jaulas de buceo y descubre que, lejos de actuar por instinto, investigan lo desconocido y <strong>comparten información</strong> para comprenderlo colectivamente.",
     posterSrc: asset("media/images/episode-3.webp"),
   },
 ];
