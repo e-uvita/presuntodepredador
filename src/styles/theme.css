@@ -51,14 +51,14 @@
   --text-episode-heading: clamp(1.6rem, 2.1vw, 2.5rem); /* Adaptable a móvil y escritorio: títulos de las tarjetas de episodios. */
   --text-typography-heading: clamp(3rem, 9vw, 8rem); /* Adaptable a móvil y escritorio: título principal de «Tipografía». */
   --text-hero-tagline: clamp(0.7rem, 0.95vw, 1rem); /* Adaptable a móvil y escritorio: frase «El tiburón que existe y el que imaginamos». */
-  --text-watch-button: clamp(1.5rem, 2.2vw, 2.3rem); /* Móvil y escritorio: botón «Ver episodio». */
+  --text-watch-button: clamp(1.5rem, 1.4vw, 0.6rem); /* Móvil y escritorio: botón «Ver episodio». */
   --text-hero-scroll: 0.8rem; /* Escritorio: enlace «Sinopsis» al pie del hero. */
   --text-hero-scroll-mobile: 0.65rem; /* Móvil: enlace «Sinopsis» al pie del hero. */
-  --text-synopsis: clamp(0.9rem, 1vw, 1.125rem); /* Adaptable a móvil y escritorio: párrafos de la sinopsis. */
+  --text-synopsis: clamp(0.9rem, 1vw, 1.12rem); /* Adaptable a móvil y escritorio: párrafos de la sinopsis. */
   --text-episode-number: clamp(2.2rem, 3vw, 3.5rem); /* Escritorio: número de episodio. */
   --text-episode-summary: clamp(0.75rem, 0.85vw, 0.95rem); /* Móvil y escritorio: resumen de la tarjeta de episodio. */
   --text-episode-duration: clamp(0.85rem, 1.2vw, 1.3rem); /* Móvil y escritorio: duración del episodio. */
-  --text-credits-toggle: 1.5rem; /* Móvil y escritorio: signo + para abrir y cerrar «Créditos». */
+  --text-credits-toggle: 1.7rem; /* Móvil y escritorio: signo + para abrir y cerrar «Créditos». */
   --text-mobile-episode-number: 2rem; /* Móvil: número de episodio. */
   --text-player-badge: 1.1rem; /* Móvil y escritorio: número de episodio dentro del reproductor. */
   --text-player-subtitle: clamp(1rem, 1.5vw, 1.6rem); /* Adaptable a móvil y escritorio: subtítulos sobre el video. */

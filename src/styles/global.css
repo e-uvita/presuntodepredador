@@ -247,8 +247,8 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 1.4rem;
-  padding: 1.15rem 1.5rem;
+  gap: .5rem;
+  padding: 0.5rem 1.25rem;
   background: var(--paper);
   color: var(--ink);
   border: 0;
@@ -262,8 +262,8 @@ h3 {
     transform 0.2s;
 }
 .watch-button svg {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .watch-button:hover {
   background: var(--progress);
