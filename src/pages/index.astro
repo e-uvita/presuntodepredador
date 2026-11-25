@@ -108,4 +108,12 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
   import { initHero } from "../lib/hero";
   const hero = document.querySelector<HTMLElement>("[data-hero]");
   if (hero) initHero(hero);
+  const linkSinopsis = document.querySelector(".hero__scroll")
+  linkSinopsis?.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: "smooth"
+    });
+  });
 </script>

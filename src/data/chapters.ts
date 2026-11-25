@@ -19,7 +19,6 @@ export interface Chapter {
 // Replace these shared preview media with the final episodes when available.
 const preview = {
   videoSrc: asset("media/video/episode-demo.mp4"),
-  durationLabel: "2:00 min",
   projection: "equirectangular" as const,
   hasAudio: false,
   isPreview: true,
@@ -29,6 +28,7 @@ export const chapters: Chapter[] = [
   {
     ...preview,
     slug: "ventral-body-upward-movement",
+    durationLabel: "1:43 min",
     number: "1",
     title: "Ventral Body Upward Movement",
     summary:
@@ -38,6 +38,7 @@ export const chapters: Chapter[] = [
   {
     ...preview,
     slug: "tail-slap",
+    durationLabel: "1:59 min",
     number: "2",
     title: "Tail Slap",
     summary:
@@ -47,6 +48,7 @@ export const chapters: Chapter[] = [
   {
     ...preview,
     slug: "ampollas-de-lorenzini",
+    durationLabel: "2:40 min",
     number: "3",
     title: "Ampollas de Lorenzini",
     summary:
