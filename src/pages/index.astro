@@ -31,17 +31,23 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
         <p class="hero__tagline" set:html={site.tagline}></p>
       </div>
       <div class="hero__bottom">
-        {
-          firstChapter && (
-            <a class="watch-button" href={chapterHref(firstChapter.slug)}>
-              Ver episodio {firstChapter.number} <Icon name="play" />
-            </a>
-          )
-        }
+        <div class="hero__actions">
+          {
+            firstChapter && (
+              <a class="watch-button" href={chapterHref(firstChapter.slug)}>
+                Play<Icon name="play" />
+              </a>
+            )
+          }
+          <a
+            class="watch-button watch-button--secondary"
+            href="#sinopsis"
+            aria-label="Leer sinopsis"
+          >
+            Más info <Icon name="plus" />
+          </a>
+        </div>
       </div>
-      <a class="hero__scroll" href="#sinopsis" aria-label="Leer sinopsis"
-        ><span>Sinopsis</span><Icon name="down" /></a
-      >
     </header>
 
     <div class="ocean-content">
@@ -108,7 +114,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
   import { initHero } from "../lib/hero";
   const hero = document.querySelector<HTMLElement>("[data-hero]");
   if (hero) initHero(hero);
-  const linkSinopsis = document.querySelector(".hero__scroll")
+  const linkSinopsis = document.querySelector(".watch-button--secondary")
   linkSinopsis?.addEventListener("click", (e) => {
     e.preventDefault();
     window.scrollTo({
