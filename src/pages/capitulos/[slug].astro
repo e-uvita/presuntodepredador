@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PanoramaPlayer from "../../components/PanoramaPlayer.astro";
 import { chapters, type Chapter } from "../../data/chapters";
-import { asset, chapterHref } from "../../lib/paths";
+import { asset } from "../../lib/paths";
 import { site } from "../../config/site";
 export function getStaticPaths() {
   return chapters.map((chapter) => ({
@@ -15,6 +15,7 @@ interface Props {
 }
 const { chapter } = Astro.props;
 const index = chapters.findIndex((item) => item.slug === chapter.slug);
+const previous = chapters[index - 1];
 const next = chapters[index + 1];
 ---
 
@@ -26,21 +27,9 @@ const next = chapters[index + 1];
     <h1 class="sr-only">Episodio {chapter.number}: {chapter.title}</h1>
     <PanoramaPlayer
       chapter={chapter}
+      previousChapter={previous}
       nextChapter={next}
       homeHref={`${asset("")}#episodios`}
     />
-    <section class="episode-info content-width" aria-labelledby="episode-title">
-      <p class="eyebrow">
-        Episodio {chapter.number}{
-          chapter.isPreview ? " · Video de muestra" : ""
-        }
-      </p>
-      <h2 id="episode-title">{chapter.title}</h2>
-      <p set:html={chapter.summary}></p>
-      <nav class="chapter-nav" aria-label="Navegación entre episodios">
-        <a href={`${asset("")}#episodios`}>← Todos los episodios</a>
-        {next && <a href={chapterHref(next.slug)}>Siguiente: {next.title} →</a>}
-      </nav>
-    </section>
   </main>
 </BaseLayout>

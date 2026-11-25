@@ -99,6 +99,21 @@ export function initWaterTitle(root: HTMLElement) {
   }
   const observer = new ResizeObserver(resize);
 
+  function uploadSource(source: TexImageSource) {
+    if (disposed) return;
+    gl!.bindTexture(gl!.TEXTURE_2D, texture);
+    gl!.texImage2D(
+      gl!.TEXTURE_2D,
+      0,
+      gl!.RGBA,
+      gl!.RGBA,
+      gl!.UNSIGNED_BYTE,
+      source,
+    );
+    ready = true;
+    resize();
+  }
+
   if (linked) {
     gl.useProgram(program);
     buffer = gl.createBuffer();
@@ -118,23 +133,48 @@ export function initWaterTitle(root: HTMLElement) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.uniform1i(gl.getUniformLocation(program, "tex0"), 0);
-    const image = new Image();
-    image.onload = () => {
-      if (disposed) return;
-      gl!.bindTexture(gl!.TEXTURE_2D, texture);
-      gl!.texImage2D(
-        gl!.TEXTURE_2D,
-        0,
-        gl!.RGBA,
-        gl!.RGBA,
-        gl!.UNSIGNED_BYTE,
-        image,
-      );
-      ready = true;
-      resize();
-    };
-    image.src = root.dataset.logo!;
     observer.observe(root);
+    if (root.dataset.text) {
+      const title = root.querySelector<HTMLElement>("[data-water-source]");
+      void document.fonts.ready.then(() => {
+        if (disposed || !title) return;
+        const style = getComputedStyle(title);
+        const width = Math.max(1, root.clientWidth);
+        const height = Math.max(1, root.clientHeight);
+        const scale = 2;
+        const source = document.createElement("canvas");
+        source.width = Math.round(width * scale);
+        source.height = Math.round(height * scale);
+        const context = source.getContext("2d");
+        if (!context) return;
+        context.scale(scale, scale);
+        context.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        context.fillStyle = style.color;
+        context.textBaseline = "top";
+        const words = root.dataset.text!.split(/\s+/);
+        const lines: string[] = [];
+        let line = "";
+        for (const word of words) {
+          const candidate = line ? `${line} ${word}` : word;
+          if (line && context.measureText(candidate).width > width) {
+            lines.push(line);
+            line = word;
+          } else line = candidate;
+        }
+        if (line) lines.push(line);
+        const fontSize = Number.parseFloat(style.fontSize) || 48;
+        const lineHeight = Number.parseFloat(style.lineHeight) || fontSize;
+        const top = Math.max(0, (height - lines.length * lineHeight) / 2);
+        lines.forEach((text, index) => {
+          context.fillText(text, 0, top + index * lineHeight, width);
+        });
+        uploadSource(source);
+      });
+    } else {
+      const image = new Image();
+      image.onload = () => uploadSource(image);
+      image.src = root.dataset.logo!;
+    }
   }
 
   const pointerMove = (event: PointerEvent) => {

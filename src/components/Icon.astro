@@ -8,6 +8,7 @@ interface Props {
     | "arrow"
     | "back"
     | "fullscreen"
+    | "fullscreenExit"
     | "down"
     | "plus";
 }
@@ -39,6 +40,7 @@ const { name } = Astro.props;
   {name === "arrow" && <path d="M6 16h21m-8-8 8 8-8 8" />}
   {name === "back" && <path d="M26 16H5m8-8-8 8 8 8" />}
   {name === "fullscreen" && <path d="M12 5H5v7m15-7h7v7M5 20v7h7m8 0h7v-7" />}
+  {name === "fullscreenExit" && <path d="M5 12h7V5m15 7h-7V5M5 20h7v7m15-7h-7v7" />}
   {name === "down" && <path d="M16 5v22m-8-8 8 8 8-8" />}
   {name === "plus" && <path d="M16 6v20M6 16h20" />}
 </svg>

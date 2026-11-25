@@ -4,11 +4,13 @@ import { chapterHref } from "../lib/paths";
 import Icon from "./Icon.astro";
 interface Props {
   chapter: Chapter;
+  previousChapter?: Chapter;
   nextChapter?: Chapter;
   homeHref?: string;
 }
 const {
   chapter,
+  previousChapter,
   nextChapter,
   homeHref = `${import.meta.env.BASE_URL}#episodios`,
 } = Astro.props;
@@ -46,7 +48,21 @@ const {
         : "Video de demostración"
     }</span
   >
-  <p class="hint" hidden>Arrastra o usa Mayús + flechas para mirar alrededor</p>
+  <p class="hint" hidden>Arrastra para mirar alrededor</p>
+  <section class="paused-info" data-paused-info hidden aria-hidden="true">
+    <div class="paused-info__copy">
+      <p class="paused-info__eyebrow">Estás viendo · Episodio {chapter.number}</p>
+      <div class="paused-info__title" data-water-title data-text={chapter.title}>
+        <h2 data-water-source>{chapter.title}</h2>
+        <canvas aria-hidden="true"></canvas>
+      </div>
+      <p class="paused-info__meta">
+        {chapter.durationLabel}
+      </p>
+      <p class="paused-info__summary" set:html={chapter.summary}></p>
+    </div>
+    <p class="paused-info__status">En pausa</p>
+  </section>
   <div class="subtitle"></div>
   <div class="notice" data-notice hidden>
     <p data-status role="status"></p>
@@ -60,51 +76,6 @@ const {
     }
   </div>
   <div class="controls" hidden>
-    <div class="actions">
-      <button class="round" type="button" data-play aria-label="Reproducir"
-        ><span data-icon-play><Icon name="play" /></span><span
-          data-icon-pause
-          hidden><Icon name="pause" /></span
-        ></button
-      >
-      <output data-time>00:00 / 00:00</output>
-      <span class="spacer"></span>
-      {
-        chapter.subtitlesSrc && (
-          <button
-            class="round small"
-            type="button"
-            data-captions
-            aria-label="Desactivar subtítulos"
-            aria-pressed="true"
-          >
-            CC
-          </button>
-        )
-      }
-      <button
-        class="round small"
-        type="button"
-        data-fullscreen
-        aria-label="Pantalla completa"><Icon name="fullscreen" /></button
-      >
-      <button
-        class="round"
-        type="button"
-        data-mute
-        disabled={!chapter.hasAudio && !chapter.audioSrc}
-        aria-label={chapter.hasAudio || chapter.audioSrc
-          ? "Silenciar"
-          : "Este video no tiene audio"}
-        title={chapter.hasAudio || chapter.audioSrc
-          ? "Silenciar"
-          : "Este video no tiene audio"}
-        ><span data-icon-sound><Icon name="sound" /></span><span
-          data-icon-muted
-          hidden><Icon name="muted" /></span
-        ></button
-      >
-    </div>
     <input
       type="range"
       min="0"
@@ -114,6 +85,92 @@ const {
       aria-label="Línea de tiempo"
       data-seek
     />
+    <div class="actions">
+      <div class="actions__left">
+        <button class="round" type="button" data-play aria-label="Reproducir"
+          ><span data-icon-play><Icon name="play" /></span><span
+            data-icon-pause
+            hidden><Icon name="pause" /></span
+          ></button
+        >
+        <output data-time>00:00 / 00:00</output>
+      </div>
+      <div class="episode-bar" role="group" aria-label="Episodio actual y navegación">
+        <div class="episode-bar__side episode-bar__side--previous">
+          {
+            previousChapter && (
+              <a
+                class="episode-switch episode-switch--previous"
+                href={chapterHref(previousChapter.slug)}
+                aria-label={`Episodio anterior: ${previousChapter.title}`}
+                title={`Episodio anterior: ${previousChapter.title}`}
+              >
+                <Icon name="back" /><span>Anterior</span>
+              </a>
+            )
+          }
+        </div>
+        <p class="episode-bar__title" title={chapter.title}>{chapter.title}</p>
+        <div class="episode-bar__side episode-bar__side--next">
+          {
+            nextChapter && (
+              <a
+                class="episode-switch episode-switch--next"
+                href={chapterHref(nextChapter.slug)}
+                aria-label={`Siguiente episodio: ${nextChapter.title}`}
+                title={`Siguiente episodio: ${nextChapter.title}`}
+              >
+                <span>Siguiente</span><Icon name="arrow" />
+              </a>
+            )
+          }
+        </div>
+      </div>
+      <div class="actions__right">
+        {
+          chapter.subtitlesSrc && (
+            <button
+              class="round small"
+              type="button"
+              data-captions
+              aria-label="Desactivar subtítulos"
+              aria-pressed="true"
+            >
+              CC
+            </button>
+          )
+        }
+        <button
+          class="round small"
+          type="button"
+          data-fullscreen
+          aria-label="Pantalla completa"
+          title="Pantalla completa"
+        >
+          <span data-icon-fullscreen><Icon name="fullscreen" /></span>
+          <span data-icon-fullscreen-exit hidden>
+            <Icon name="fullscreenExit" />
+          </span>
+        </button
+        >
+        <button
+          class="round"
+          type="button"
+          data-mute
+          disabled={!chapter.hasAudio && !chapter.audioSrc}
+          aria-label={chapter.hasAudio || chapter.audioSrc
+            ? "Silenciar"
+            : "Este video no tiene audio"}
+          title={chapter.hasAudio || chapter.audioSrc
+            ? "Silenciar"
+            : "Este video no tiene audio"}
+          ><span data-icon-sound><Icon name="sound" /></span><span
+            data-icon-muted
+            hidden><Icon name="muted" /></span
+          ></button
+        >
+      </div>
+    </div>
   </div>
 </section>
 
@@ -157,12 +214,82 @@ const {
     pointer-events: none;
     background: var(--player-shade);
   }
+  .paused-info {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: clamp(8rem, 8vw, 1rem);
+    background: linear-gradient(
+      90deg,
+      rgb(20 25 48 / 78%) 0%,
+      rgb(20 25 48 / 54%) 62%,
+      rgb(20 25 48 / 12%) 100%
+    );
+    pointer-events: none;
+  }
+  .paused-info__copy {
+    width: min(100%, 58rem);
+  }
+  .paused-info__eyebrow {
+    margin: 0 0 0.9rem;
+    font: 600 clamp(1rem, 1vw, 1rem)/1.2 var(--font-body, Georgia, serif);
+  }
+  .paused-info__title {
+    position: relative;
+    width: min(100%, 54rem);
+    margin-bottom: 1.25rem;
+  }
+  .paused-info__title h2 {
+    margin: 0;
+    color: var(--paper);
+    font: 700 clamp(3rem, 8vw, 8rem)/0.9 var(--font-display);
+    overflow-wrap: anywhere;
+    transition: opacity 0.2s;
+  }
+  .paused-info__title canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+  .paused-info__title[data-ready] h2 {
+    opacity: 0;
+  }
+  .paused-info__title[data-ready] canvas {
+    opacity: 1;
+  }
+  .paused-info__summary {
+    max-width: 55ch;
+    margin: 0;
+    font: 400 clamp(1rem, 1vw, 1rem)/1.5 var(--font-body, Georgia, serif);
+
+  }
+  .paused-info__meta {
+    margin: -0.5rem 0 0.8rem;
+    font: 600 0.95rem/1.3 var(--font-body, Georgia, serif);
+  }
+  .paused-info__eyebrow,
+  .paused-info__meta,
+  .paused-info__summary {
+    margin-left: 3rem;
+  }
+  .paused-info__status {
+    position: absolute;
+    right: clamp(1.25rem, 3vw, 3rem);
+    bottom: clamp(1rem, 2vw, 2rem);
+    margin: 0;
+    font: 500 1rem/1.2 var(--font-body, Georgia, serif);
+  }
   .round {
     display: grid;
     place-items: center;
     flex: none;
-    width: 4.25rem;
-    height: 4.25rem;
+    width: 2.75rem;
+    height: 2.75rem;
     border: 0;
     border-radius: 50%;
     background: var(--paper);
@@ -170,6 +297,11 @@ const {
     cursor: pointer;
     font: bold var(--text-emphasis)/1 var(--font-controls);
     text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .round:not(:disabled):hover {
+    background: var(--progress);
+    color: var(--paper);
   }
   .round:focus-visible,
   input:focus-visible,
@@ -179,6 +311,7 @@ const {
   }
   .back {
     position: absolute;
+    z-index: 3;
     top: 1.8rem;
     left: 1.8rem;
   }
@@ -197,6 +330,7 @@ const {
   }
   .badge {
     position: absolute;
+    z-index: 3;
     top: 2.3rem;
     right: 1.8rem;
     color: var(--ink);
@@ -207,14 +341,25 @@ const {
   }
   .hint {
     position: absolute;
-    top: 5.5rem;
-    right: 1.8rem;
+    z-index: 3;
+    top: 2rem;
+    left: 50%;
+    width: max-content;
+    max-width: calc(100% - 2rem);
+    transform: translateX(-50%);
     padding: 0.4rem 0.65rem;
     background: var(--overlay);
     font: var(--text-xl) var(--font-body, Georgia, serif);
+    text-align: center;
+    opacity: 0.5;
+    transition: opacity 0.7s ease;
+  }
+  .hint[data-fading="true"] {
+    opacity: 0;
   }
   .subtitle {
     position: absolute;
+    z-index: 3;
     bottom: 6rem;
     left: 12%;
     width: 76%;
@@ -227,22 +372,46 @@ const {
   }
   .controls {
     position: absolute;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
     bottom: 1.8rem;
     left: 1.8rem;
     right: 1.8rem;
   }
+  .back,
+  .badge,
+  .hint,
+  .controls {
+    transition: opacity 0.2s ease;
+  }
+  .player[data-controls-hidden="true"] .back,
+  .player[data-controls-hidden="true"] .badge,
+  .player[data-controls-hidden="true"] .controls {
+    opacity: 0;
+    pointer-events: none;
+  }
   .actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
     align-items: center;
     gap: 0.65rem;
-    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+  }
+  .actions__left,
+  .actions__right {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .actions__right {
+    justify-content: flex-end;
   }
   output {
-    font: var(--text-xl) var(--font-controls);
+    font: var(--text-xl) var(--font-body, Georgia, serif);
     text-shadow: var(--media-shadow);
-  }
-  .spacer {
-    flex: 1;
+    white-space: nowrap;
   }
   .small {
     width: 2.75rem;
@@ -250,6 +419,8 @@ const {
     font-size: var(--text-player-small-control);
   }
   input[type="range"] {
+    --seek-track-height: 0.25rem;
+    --seek-thumb-scale: 1;
     display: block;
     width: 100%;
     height: 1.5rem;
@@ -259,41 +430,105 @@ const {
     cursor: pointer;
     background: transparent;
   }
+  .episode-bar {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .episode-bar__side {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+  }
+  .episode-bar__side--previous {
+    justify-content: flex-end;
+  }
+  .episode-bar__side--next {
+    justify-content: flex-start;
+  }
+  .episode-bar__title {
+    grid-column: 2;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--paper);
+    font: 600 clamp(1.5rem, 1.1vw, 1.1rem)/1.2 var(--font-display);
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .episode-switch {
+    display: inline-flex;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0 0.85rem;
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--paper) 18%, transparent);
+    color: var(--paper);
+    font: 600 0.85rem/1 var(--font-body, Georgia, serif);
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .episode-switch:hover {
+    background: var(--progress);
+    color: var(--paper);
+  }
+  .episode-switch svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  input[type="range"]:hover,
+  input[type="range"]:active,
+  input[type="range"]:focus-visible {
+    --seek-track-height: 0.55rem;
+    --seek-thumb-scale: 1.35;
+  }
   input[type="range"]::-webkit-slider-runnable-track {
-    height: 0.7rem;
+    height: var(--seek-track-height);
     border-radius: 1rem;
+    transition: height 0.15s ease;
     background: linear-gradient(
       to right,
-      var(--progress) var(--progress, 0%),
-      var(--paper) var(--progress, 0%)
+      var(--ocean-deep) var(--seek-progress, 0%),
+      color-mix(in srgb, var(--paper) 38%, transparent) var(--seek-progress, 0%)
     );
   }
   input[type="range"]::-moz-range-track {
-    height: 0.7rem;
+    height: var(--seek-track-height);
     border-radius: 1rem;
+    transition: height 0.15s ease;
     background: linear-gradient(
       to right,
-      var(--progress) var(--progress, 0%),
-      var(--paper) var(--progress, 0%)
+      var(--ocean-deep) var(--seek-progress, 0%),
+      color-mix(in srgb, var(--paper) 38%, transparent) var(--seek-progress, 0%)
     );
   }
   input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    width: 1.2rem;
-    height: 1.2rem;
-    margin-top: -0.25rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: -0.225rem;
     border-radius: 50%;
-    background: var(--progress);
+    background: var(--ocean-deep);
+    transition: transform 0.15s ease;
+    transform: scale(var(--seek-thumb-scale));
   }
   input[type="range"]::-moz-range-thumb {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 0.7rem;
+    height: 0.7rem;
     border: 0;
     border-radius: 50%;
-    background: var(--progress);
+    background: var(--ocean-deep);
+    transition: transform 0.15s ease;
+    transform: scale(var(--seek-thumb-scale));
   }
   .notice {
     position: absolute;
+    z-index: 4;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -314,6 +549,22 @@ const {
     display: none !important;
   }
   @media (max-width: 600px) {
+    .paused-info {
+      align-items: flex-end;
+      padding: 1.25rem 1.25rem 7.5rem;
+      background: linear-gradient(
+        0deg,
+        rgb(20 25 48 / 92%) 0%,
+        rgb(20 25 48 / 68%) 58%,
+        rgb(20 25 48 / 10%) 100%
+      );
+    }
+    .paused-info__title h2 {
+      font-size: clamp(3rem, 15vw, 5rem);
+    }
+    .paused-info__summary {
+      font-size: 1rem;
+    }
     .back {
       top: 1rem;
       left: 1rem;
@@ -324,8 +575,8 @@ const {
       right: 1rem;
     }
     .round {
-      width: 3.25rem;
-      height: 3.25rem;
+      width: 2.75rem;
+      height: 2.75rem;
     }
     .controls {
       left: 1rem;
@@ -333,8 +584,30 @@ const {
       bottom: 1.2rem;
     }
     .actions {
-      gap: 0.35rem;
-      margin-bottom: 1rem;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.3rem;
+      margin-top: 0.75rem;
+    }
+    .actions__left,
+    .actions__right {
+      gap: 0.25rem;
+    }
+    .actions__left output {
+      font-size: 0.72rem;
+    }
+    .episode-bar {
+      grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+      gap: 0.15rem;
+    }
+    .episode-bar__title {
+      font-size: 0.8rem;
+    }
+    .episode-switch {
+      width: 2.75rem;
+      padding: 0;
+    }
+    .episode-switch span {
+      display: none;
     }
     .small {
       width: 2.75rem;

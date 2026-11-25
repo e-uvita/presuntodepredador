@@ -1,4 +1,5 @@
 import { cueAtTime, parseSrt, type SubtitleCue } from "./srt-parser";
+import { initWaterTitle } from "./water-title";
 const formatTime = (seconds: number) =>
   Number.isFinite(seconds)
     ? `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`
@@ -19,8 +20,11 @@ export function initPlayers() {
       const captions = root.querySelector<HTMLButtonElement>("[data-captions]");
       const next = root.querySelector<HTMLAnchorElement>("[data-next]");
       const notice = root.querySelector<HTMLElement>("[data-notice]")!;
+      const hint = root.querySelector<HTMLElement>(".hint")!;
       const status = root.querySelector<HTMLElement>("[data-status]")!;
       const retry = root.querySelector<HTMLButtonElement>("[data-retry]")!;
+      const pausedInfo = root.querySelector<HTMLElement>("[data-paused-info]");
+      const pausedTitle = pausedInfo?.querySelector<HTMLElement>("[data-water-title]");
       const separate = Boolean(root.dataset.audio);
       const hasAudio = separate || root.dataset.hasAudio === "true";
       const master = separate ? audio : video;
@@ -30,11 +34,153 @@ export function initPlayers() {
       let renderOnce = () => {};
       let startRendering = () => {};
       let stopRendering = () => {};
+      let titleFrame = 0;
+      let titlePrevious = 0;
+      let titleTime = 0;
+      let titleWater: ReturnType<typeof initWaterTitle> | undefined;
+      let controlsIdleTimer = 0;
+      let hintTimer = 0;
+      let hintFadeTimer = 0;
+      let hintStartedAt = 0;
+      let hintRemaining = 5000;
+      let panoramaReady = false;
       video.controls = false;
       video.playsInline = true;
       if (!hasAudio) video.muted = true;
       controls.hidden = false;
       video.loop = root.dataset.loop === "true";
+      const stopPausedTitle = () => {
+        cancelAnimationFrame(titleFrame);
+        titleFrame = 0;
+      };
+      const animatePausedTitle = (now: number) => {
+        if (!pausedInfo || pausedInfo.hidden || !master.paused || document.hidden) {
+          titleFrame = 0;
+          return;
+        }
+        if (now - titlePrevious >= 1000 / 30) {
+          titleTime += Math.min((now - titlePrevious) / 1000, 0.1);
+          titlePrevious = now;
+          titleWater?.draw(titleTime);
+        }
+        titleFrame = requestAnimationFrame(animatePausedTitle);
+      };
+      const startPausedTitle = () => {
+        if (
+          !pausedInfo ||
+          !pausedTitle ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        )
+          return;
+        titleWater ??= initWaterTitle(pausedTitle);
+        titlePrevious = performance.now();
+        if (!titleFrame) titleFrame = requestAnimationFrame(animatePausedTitle);
+      };
+      const hidePausedInfo = () => {
+        stopPausedTitle();
+        if (pausedInfo) {
+          pausedInfo.hidden = true;
+          pausedInfo.setAttribute("aria-hidden", "true");
+        }
+      };
+      const showPausedInfo = () => {
+        if (!pausedInfo || !master.paused || master.ended || !notice.hidden)
+          return;
+        pausedInfo.hidden = false;
+        pausedInfo.setAttribute("aria-hidden", "false");
+        startPausedTitle();
+      };
+      const stopHintCountdown = () => {
+        if (!hintTimer) return;
+        window.clearTimeout(hintTimer);
+        hintTimer = 0;
+        hintRemaining = Math.max(
+          0,
+          hintRemaining - (performance.now() - hintStartedAt),
+        );
+      };
+      const showHint = () => {
+        window.clearTimeout(hintFadeTimer);
+        hintFadeTimer = 0;
+        delete hint.dataset.fading;
+        hint.hidden = false;
+      };
+      const hideHint = () => {
+        window.clearTimeout(hintTimer);
+        hintTimer = 0;
+        hintRemaining = 0;
+        if (hint.hidden || hintFadeTimer) return;
+        hint.dataset.fading = "true";
+        hintFadeTimer = window.setTimeout(() => {
+          hint.hidden = true;
+          delete hint.dataset.fading;
+          hintFadeTimer = 0;
+        }, 700);
+      };
+      const startHintCountdown = () => {
+        if (
+          hint.hidden ||
+          hint.dataset.fading === "true" ||
+          !panoramaReady ||
+          master.paused ||
+          hintTimer
+        )
+          return;
+        if (hintRemaining <= 0) {
+          hideHint();
+          return;
+        }
+        hintStartedAt = performance.now();
+        hintTimer = window.setTimeout(hideHint, hintRemaining);
+      };
+      const revealControls = () => {
+        if (master.paused && pausedInfo && !pausedInfo.hidden) hidePausedInfo();
+        delete root.dataset.controlsHidden;
+        if (!master.paused && panoramaReady) {
+          if (hint.hidden || hint.dataset.fading === "true") {
+            showHint();
+            hintRemaining = 5000;
+          }
+          startHintCountdown();
+        }
+        window.clearTimeout(controlsIdleTimer);
+        controlsIdleTimer = window.setTimeout(() => {
+          root.dataset.controlsHidden = "true";
+          if (master.paused) {
+            hideHint();
+            showPausedInfo();
+          }
+        }, 3000);
+      };
+      const chromeTargets = Array.from(
+        root.querySelectorAll<HTMLElement>(".back, .badge, .hint, .controls"),
+      );
+      const handlePointerActivity = (event: PointerEvent) => {
+        if (master.paused && pausedInfo && !pausedInfo.hidden) {
+          revealControls();
+          return;
+        }
+        const proximity = 64;
+        const nearChrome = chromeTargets.some((target) => {
+          const rect = target.getBoundingClientRect();
+          return (
+            event.clientX >= rect.left - proximity &&
+            event.clientX <= rect.right + proximity &&
+            event.clientY >= rect.top - proximity &&
+            event.clientY <= rect.bottom + proximity
+          );
+        });
+        if (nearChrome) revealControls();
+      };
+      root.addEventListener("pointermove", handlePointerActivity, {
+        passive: true,
+      });
+      root.addEventListener("pointerdown", handlePointerActivity, {
+        passive: true,
+      });
+      root.addEventListener("keydown", revealControls);
+      root.addEventListener("focusin", revealControls);
+      revealControls();
       if (separate) {
         audio.src = root.dataset.audio!;
         video.muted = true;
@@ -55,7 +201,7 @@ export function initPlayers() {
           `${formatTime(current)} de ${formatTime(total)}`,
         );
         seek.style.setProperty(
-          "--progress",
+          "--seek-progress",
           `${Number.isFinite(total) && total > 0 ? (current / total) * 100 : 0}%`,
         );
         time.value = `${formatTime(current)} / ${formatTime(total)}`;
@@ -141,26 +287,53 @@ export function initPlayers() {
         );
         update();
       });
-      root
-        .querySelector<HTMLButtonElement>("[data-fullscreen]")!
-        .addEventListener("click", async () => {
-          try {
-            if (document.fullscreenElement) await document.exitFullscreen();
-            else if (root.requestFullscreen) await root.requestFullscreen();
-            else if ("webkitEnterFullscreen" in video)
-              (
-                video as HTMLVideoElement & {
-                  webkitEnterFullscreen: () => void;
-                }
-              ).webkitEnterFullscreen();
-            else
-              error(
-                "La pantalla completa no está disponible en este navegador.",
-              );
-          } catch {
-            error("No se pudo abrir la pantalla completa.");
-          }
-        });
+      const fullscreen = root.querySelector<HTMLButtonElement>("[data-fullscreen]")!;
+      const fullscreenIcon = fullscreen.querySelector<HTMLElement>("[data-icon-fullscreen]")!;
+      const fullscreenExitIcon = fullscreen.querySelector<HTMLElement>("[data-icon-fullscreen-exit]")!;
+      const webkitVideo = video as HTMLVideoElement & {
+        webkitDisplayingFullscreen?: boolean;
+        webkitEnterFullscreen?: () => void;
+        webkitExitFullscreen?: () => void;
+      };
+      const updateFullscreenButton = () => {
+        const isFullscreen =
+          document.fullscreenElement === root ||
+          Boolean(webkitVideo.webkitDisplayingFullscreen);
+        fullscreenIcon.hidden = isFullscreen;
+        fullscreenExitIcon.hidden = !isFullscreen;
+        fullscreen.setAttribute(
+          "aria-label",
+          isFullscreen ? "Salir de pantalla completa" : "Pantalla completa",
+        );
+        fullscreen.title = isFullscreen
+          ? "Salir de pantalla completa"
+          : "Pantalla completa";
+      };
+      fullscreen.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else if (webkitVideo.webkitDisplayingFullscreen)
+            webkitVideo.webkitExitFullscreen?.();
+          else if (root.requestFullscreen) await root.requestFullscreen();
+          else if (webkitVideo.webkitEnterFullscreen)
+            webkitVideo.webkitEnterFullscreen();
+          else
+            error(
+              "La pantalla completa no está disponible en este navegador.",
+            );
+        } catch {
+          error("No se pudo abrir la pantalla completa.");
+        }
+      });
+      document.addEventListener("fullscreenchange", updateFullscreenButton, {
+        signal: lifecycle.signal,
+      });
+      video.addEventListener("webkitbeginfullscreen", updateFullscreenButton, {
+        signal: lifecycle.signal,
+      });
+      video.addEventListener("webkitendfullscreen", updateFullscreenButton, {
+        signal: lifecycle.signal,
+      });
       retry.addEventListener("click", () => {
         notice.hidden = true;
         video.load();
@@ -181,9 +354,20 @@ export function initPlayers() {
         "seeked",
       ])
         master.addEventListener(event, update);
+      master.addEventListener("pause", () => {
+        stopHintCountdown();
+        revealControls();
+      });
+      master.addEventListener("play", () => {
+        hidePausedInfo();
+        revealControls();
+        startHintCountdown();
+      });
       master.addEventListener("play", () => startRendering());
       master.addEventListener("pause", () => stopRendering());
       master.addEventListener("ended", () => {
+        hidePausedInfo();
+        revealControls();
         video.pause();
         stopRendering();
         update();
@@ -197,8 +381,11 @@ export function initPlayers() {
       document.addEventListener(
         "visibilitychange",
         () => {
-          if (document.hidden) stopRendering();
-          else if (!master.paused) startRendering();
+          if (document.hidden) {
+            stopRendering();
+            stopPausedTitle();
+          } else if (!master.paused) startRendering();
+          else if (pausedInfo && !pausedInfo.hidden) startPausedTitle();
         },
         { signal: lifecycle.signal },
       );
@@ -237,12 +424,16 @@ export function initPlayers() {
             }
           });
       if (root.dataset.projection === "equirectangular") {
-        const hint = root.querySelector<HTMLElement>(".hint")!;
         const badge = root.querySelector<HTMLElement>(".badge")!;
         const fallback = () => {
+          panoramaReady = false;
           canvas.hidden = true;
           video.classList.remove("canvas-video");
+          window.clearTimeout(hintFadeTimer);
+          hintFadeTimer = 0;
+          delete hint.dataset.fading;
           hint.hidden = true;
+          stopHintCountdown();
           badge.textContent = "Video";
         };
         void import("three")
@@ -294,7 +485,10 @@ export function initPlayers() {
               render();
               canvas.hidden = false;
               video.classList.add("canvas-video");
-              hint.hidden = false;
+              panoramaReady = true;
+              showHint();
+              if (hintRemaining <= 0) hintRemaining = 5000;
+              startHintCountdown();
               badge.textContent = "360°";
             };
             const loop = (now: number) => {
@@ -432,6 +626,11 @@ export function initPlayers() {
         (event) => {
           if (event.persisted) return;
           lifecycle.abort();
+          window.clearTimeout(controlsIdleTimer);
+          window.clearTimeout(hintTimer);
+          window.clearTimeout(hintFadeTimer);
+          stopPausedTitle();
+          titleWater?.dispose();
           video.pause();
           audio.pause();
         },
