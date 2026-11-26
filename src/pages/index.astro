@@ -6,7 +6,7 @@ import Icon from "../components/Icon.astro";
 import SiteNav from "../components/SiteNav.astro";
 import { site } from "../config/site";
 import { chapters } from "../data/chapters";
-import { synopsis, credits } from "../data/story";
+import { introduction, synopsis, credits } from "../data/story";
 import { chapterHref } from "../lib/paths";
 const firstChapter = chapters[0];
 const hasPreviews = chapters.some((chapter) => chapter.isPreview);
@@ -28,14 +28,14 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
       <div class="hero__title">
         <h1 class="sr-only">{site.name}</h1>
         <WaterTitle />
-        <p class="hero__tagline" set:html={site.tagline}></p>
+        <p class="hero__tagline" set:html={introduction}></p>
       </div>
       <div class="hero__bottom">
         <div class="hero__actions">
           {
             firstChapter && (
               <a class="watch-button" href={chapterHref(firstChapter.slug)}>
-                Play<Icon name="play" />
+                Explora las profundidades<Icon name="play" />
               </a>
             )
           }
@@ -44,7 +44,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
             href="#sinopsis"
             aria-label="Leer sinopsis"
           >
-            Más info <Icon name="plus" />
+            Sinopsis <Icon name="plus" />
           </a>
         </div>
       </div>
@@ -58,7 +58,7 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
           aria-labelledby="synopsis-title"
         >
           <p class="eyebrow">{site.year} · {chapters.length} episodios</p>
-          <h2 id="synopsis-title">Sinopsis</h2>
+          <h2 id="synopsis-title" set:html={site.tagline} />
           <div class="synopsis__text">
             {synopsis.map((paragraph) => <p set:html={paragraph} />)}
           </div>
@@ -114,12 +114,4 @@ const hasPreviews = chapters.some((chapter) => chapter.isPreview);
   import { initHero } from "../lib/hero";
   const hero = document.querySelector<HTMLElement>("[data-hero]");
   if (hero) initHero(hero);
-  const linkSinopsis = document.querySelector(".watch-button--secondary")
-  linkSinopsis?.addEventListener("click", (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: "smooth"
-    });
-  });
 </script>

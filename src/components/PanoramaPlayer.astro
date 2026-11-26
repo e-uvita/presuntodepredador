@@ -2,6 +2,8 @@
 import type { Chapter } from "../data/chapters";
 import { chapterHref } from "../lib/paths";
 import Icon from "./Icon.astro";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 interface Props {
   chapter: Chapter;
   previousChapter?: Chapter;
@@ -14,6 +16,10 @@ const {
   nextChapter,
   homeHref = `${import.meta.env.BASE_URL}#episodios`,
 } = Astro.props;
+const markSvg = readFileSync(
+  resolve(process.cwd(), "public/branding/mark.svg"),
+  "utf8",
+).replace(/^<\?xml[^>]*\?>\s*/, "");
 ---
 
 <section
@@ -38,9 +44,10 @@ const {
   <canvas hidden aria-hidden="true"></canvas>
   <audio hidden preload="metadata"></audio>
   <div class="shade"></div>
-  <a class="back round" href={homeHref} aria-label="Volver a los episodios"
-    ><Icon name="back" /></a
-  >
+  <a class="back" href={homeHref} aria-label="Volver a los episodios">
+    <span class="back__mark" aria-hidden="true" set:html={markSvg}></span>
+    <span class="back__label">Volver</span>
+  </a>
   <span class="badge"
     >{
       chapter.projection === "equirectangular"
@@ -48,7 +55,7 @@ const {
         : "Video de demostración"
     }</span
   >
-  <p class="hint" hidden>Arrastra para mirar alrededor</p>
+  <p class="hint" data-mode="intro" hidden>Arrastra para mirar alrededor</p>
   <section class="paused-info" data-paused-info hidden aria-hidden="true">
     <div class="paused-info__copy">
       <p class="paused-info__eyebrow">Estás viendo · Episodio {chapter.number}</p>
@@ -105,7 +112,7 @@ const {
                 aria-label={`Episodio anterior: ${previousChapter.title}`}
                 title={`Episodio anterior: ${previousChapter.title}`}
               >
-                <Icon name="back" /><span>Anterior</span>
+                <Icon name="back" />
               </a>
             )
           }
@@ -120,7 +127,7 @@ const {
                 aria-label={`Siguiente episodio: ${nextChapter.title}`}
                 title={`Siguiente episodio: ${nextChapter.title}`}
               >
-                <span>Siguiente</span><Icon name="arrow" />
+                <Icon name="arrow" />
               </a>
             )
           }
@@ -314,6 +321,40 @@ const {
     z-index: 3;
     top: 1.8rem;
     left: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .back__mark {
+    display: block;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .back__mark :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .back:hover .back__mark :global(.cls-1) {
+    fill: var(--progress);
+  }
+  .back:hover .back__mark :global(.cls-2) {
+    fill: var(--paper);
+  }
+  .back__label {
+    font: 400 var(--text-xs)/1 var(--font-body, Georgia, serif);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-shadow: var(--media-shadow);
+  }
+  .back:focus-visible {
+    outline: 3px solid var(--caption);
+    outline-offset: 4px;
+    border-radius: 2rem;
   }
   .round :global(svg) {
     display: block;
@@ -339,20 +380,36 @@ const {
     padding: 0.45rem 0.65rem;
     border-radius: 2rem;
   }
+  /* Instrucción de arrastre: primero destacada al centro, luego discreta arriba. */
   .hint {
     position: absolute;
     z-index: 3;
-    top: 2rem;
     left: 50%;
     width: max-content;
     max-width: calc(100% - 2rem);
-    transform: translateX(-50%);
-    padding: 0.4rem 0.65rem;
-    background: var(--overlay);
-    font: var(--text-xl) var(--font-body, Georgia, serif);
+    margin: 0;
+    color: var(--paper);
     text-align: center;
-    opacity: 0.5;
+    pointer-events: none;
     transition: opacity 0.7s ease;
+  }
+  .hint[data-mode="intro"] {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0.9rem 1.4rem;
+    border-radius: var(--radius-image);
+    background: var(--overlay);
+    font: 600 var(--text-xl)/1.3 var(--font-body, Georgia, serif);
+  }
+  .hint[data-mode="compact"] {
+    top: 2.3rem;
+    transform: translateX(-50%);
+    padding: 0.45rem 0.8rem;
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--ink) 45%, transparent);
+    font: 400 var(--text-xs)/1 var(--font-body, Georgia, serif);
+    letter-spacing: 0.06em;
+    opacity: 0.8;
   }
   .hint[data-fading="true"] {
     opacity: 0;
@@ -387,6 +444,7 @@ const {
   }
   .player[data-controls-hidden="true"] .back,
   .player[data-controls-hidden="true"] .badge,
+  .player[data-controls-hidden="true"] .hint[data-mode="compact"],
   .player[data-controls-hidden="true"] .controls {
     opacity: 0;
     pointer-events: none;
@@ -433,7 +491,7 @@ const {
   .episode-bar {
     display: grid;
     min-width: 0;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
     align-items: center;
     gap: 0.65rem;
   }
@@ -461,12 +519,12 @@ const {
   }
   .episode-switch {
     display: inline-flex;
+    flex: none;
+    width: 2.75rem;
     height: 2.75rem;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    padding: 0 0.85rem;
-    border-radius: 2rem;
+    border-radius: 50%;
     background: color-mix(in srgb, var(--paper) 18%, transparent);
     color: var(--paper);
     font: 600 0.85rem/1 var(--font-body, Georgia, serif);
@@ -477,9 +535,9 @@ const {
     background: var(--progress);
     color: var(--paper);
   }
-  .episode-switch svg {
-    width: 1rem;
-    height: 1rem;
+  .episode-switch :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
   }
   input[type="range"]:hover,
   input[type="range"]:active,
@@ -568,7 +626,17 @@ const {
     .back {
       top: 1rem;
       left: 1rem;
-      font-size: var(--text-player-back);
+      gap: 0.55rem;
+    }
+    .back__label {
+      font-size: var(--text-2xs);
+    }
+    .hint[data-mode="compact"] {
+      top: 4.4rem;
+      font-size: var(--text-2xs);
+    }
+    .hint[data-mode="intro"] {
+      font-size: var(--text-md);
     }
     .badge {
       top: 1rem;
@@ -596,18 +664,10 @@ const {
       font-size: 0.72rem;
     }
     .episode-bar {
-      grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
       gap: 0.15rem;
     }
     .episode-bar__title {
       font-size: 0.8rem;
-    }
-    .episode-switch {
-      width: 2.75rem;
-      padding: 0;
-    }
-    .episode-switch span {
-      display: none;
     }
     .small {
       width: 2.75rem;

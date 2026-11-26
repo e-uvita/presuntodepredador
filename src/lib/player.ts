@@ -42,7 +42,10 @@ export function initPlayers() {
       let hintTimer = 0;
       let hintFadeTimer = 0;
       let hintStartedAt = 0;
-      let hintRemaining = 5000;
+      // The hint starts as a prominent intro and, once it has been seen for
+      // a few seconds of playback, settles into a discreet label at the top.
+      const hintIntroDuration = 3000;
+      let hintRemaining = hintIntroDuration;
       let panoramaReady = false;
       video.controls = false;
       video.playsInline = true;
@@ -100,19 +103,16 @@ export function initPlayers() {
         );
       };
       const showHint = () => {
-        window.clearTimeout(hintFadeTimer);
-        hintFadeTimer = 0;
-        delete hint.dataset.fading;
         hint.hidden = false;
       };
-      const hideHint = () => {
+      const settleHint = () => {
         window.clearTimeout(hintTimer);
         hintTimer = 0;
         hintRemaining = 0;
-        if (hint.hidden || hintFadeTimer) return;
+        if (hint.dataset.mode === "compact" || hintFadeTimer) return;
         hint.dataset.fading = "true";
         hintFadeTimer = window.setTimeout(() => {
-          hint.hidden = true;
+          hint.dataset.mode = "compact";
           delete hint.dataset.fading;
           hintFadeTimer = 0;
         }, 700);
@@ -120,6 +120,7 @@ export function initPlayers() {
       const startHintCountdown = () => {
         if (
           hint.hidden ||
+          hint.dataset.mode === "compact" ||
           hint.dataset.fading === "true" ||
           !panoramaReady ||
           master.paused ||
@@ -127,27 +128,21 @@ export function initPlayers() {
         )
           return;
         if (hintRemaining <= 0) {
-          hideHint();
+          settleHint();
           return;
         }
         hintStartedAt = performance.now();
-        hintTimer = window.setTimeout(hideHint, hintRemaining);
+        hintTimer = window.setTimeout(settleHint, hintRemaining);
       };
       const revealControls = () => {
         if (master.paused && pausedInfo && !pausedInfo.hidden) hidePausedInfo();
         delete root.dataset.controlsHidden;
-        if (!master.paused && panoramaReady) {
-          if (hint.hidden || hint.dataset.fading === "true") {
-            showHint();
-            hintRemaining = 5000;
-          }
-          startHintCountdown();
-        }
+        if (!master.paused && panoramaReady) startHintCountdown();
         window.clearTimeout(controlsIdleTimer);
         controlsIdleTimer = window.setTimeout(() => {
           root.dataset.controlsHidden = "true";
           if (master.paused) {
-            hideHint();
+            settleHint();
             showPausedInfo();
           }
         }, 3000);
@@ -487,7 +482,6 @@ export function initPlayers() {
               video.classList.add("canvas-video");
               panoramaReady = true;
               showHint();
-              if (hintRemaining <= 0) hintRemaining = 5000;
               startHintCountdown();
               badge.textContent = "360°";
             };

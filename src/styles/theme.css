@@ -50,7 +50,7 @@
   --text-section-heading: clamp(1.9rem, 2.5vw, 2.8rem); /* Adaptable a móvil y escritorio: títulos «Sinopsis» y «Episodios». */
   --text-episode-heading: clamp(1.6rem, 2.1vw, 2.5rem); /* Adaptable a móvil y escritorio: títulos de las tarjetas de episodios. */
   --text-typography-heading: clamp(3rem, 9vw, 8rem); /* Adaptable a móvil y escritorio: título principal de «Tipografía». */
-  --text-hero-tagline: clamp(1.1rem, 0.95vw, 1rem); /* Adaptable a móvil y escritorio: frase «El tiburón que existe y el que imaginamos». */
+  --text-hero-tagline: clamp(1.1rem, 0.95vw, 1rem); /* Adaptable a móvil y escritorio: párrafo de bienvenida bajo el título principal. */
   --text-watch-button: clamp(1.7rem, 1.7vw, 0.8rem); /* Móvil y escritorio: botón «Ver episodio». */
   --text-synopsis: clamp(0.9rem, 1vw, 1.12rem); /* Adaptable a móvil y escritorio: párrafos de la sinopsis. */
   --text-episode-number: clamp(2.2rem, 3vw, 3.5rem); /* Escritorio: número de episodio. */
@@ -64,7 +64,9 @@
   --text-player-back: 2.4rem; /* Móvil: flecha para volver. */
 
   /* Shared dimensions */
-  --content-width: 1600px;
+  --content-width: 1600px; /* Ancho máximo de la safe-area de textos. */
+  --page-gutter: 84%; /* Ancho relativo de la safe-area: hero, sinopsis, episodios y pie. */
+  --text-measure: 990px; /* Ancho máximo de lectura: tagline del hero y sinopsis. */
   --radius-card: 1.4rem;
   --radius-image: 1rem;
 }
