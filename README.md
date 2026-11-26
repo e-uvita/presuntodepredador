@@ -5,8 +5,8 @@ Borrador local de la serie audiovisual de Elizabeth Lezama Jacinto. Astro genera
 ## Empezar
 
 ```sh
-bun install
-bun run dev
+npm install
+npm run dev
 ```
 
 Abrir <http://localhost:4321/presuntodepredador/>. La página de tipografía está en `/presuntodepredador/tipografia/`.

@@ -30,6 +30,7 @@ const markSvg = readFileSync(
   data-audio={chapter.audioSrc}
   data-subtitles={chapter.subtitlesSrc}
   data-loop={String(Boolean(chapter.loopVideo))}
+  data-next-href={nextChapter ? chapterHref(nextChapter.slug) : undefined}
   tabindex="0"
   aria-label={`Reproductor: ${chapter.title}`}
 >
@@ -74,13 +75,6 @@ const markSvg = readFileSync(
   <div class="notice" data-notice hidden>
     <p data-status role="status"></p>
     <button type="button" data-retry>Reintentar</button>
-    {
-      nextChapter && (
-        <a href={chapterHref(nextChapter.slug)} data-next hidden>
-          Siguiente episodio →
-        </a>
-      )
-    }
   </div>
   <div class="controls" hidden>
     <input
@@ -188,6 +182,8 @@ const markSvg = readFileSync(
 
 <style>
   .player {
+    /* Safe-area del reproductor: volver, etiqueta, pausa y controles comparten borde. */
+    --player-safe: 1.8rem;
     position: relative;
     width: 100%;
     height: 100vh;
@@ -227,7 +223,7 @@ const markSvg = readFileSync(
     inset: 0;
     display: flex;
     align-items: center;
-    padding: clamp(8rem, 8vw, 1rem);
+    padding: 8rem var(--player-safe);
     background: linear-gradient(
       90deg,
       rgb(20 25 48 / 78%) 0%,
@@ -279,14 +275,9 @@ const markSvg = readFileSync(
     margin: -0.5rem 0 0.8rem;
     font: 600 0.95rem/1.3 var(--font-body, Georgia, serif);
   }
-  .paused-info__eyebrow,
-  .paused-info__meta,
-  .paused-info__summary {
-    margin-left: 3rem;
-  }
   .paused-info__status {
     position: absolute;
-    right: clamp(1.25rem, 3vw, 3rem);
+    right: var(--player-safe);
     bottom: clamp(1rem, 2vw, 2rem);
     margin: 0;
     font: 500 1rem/1.2 var(--font-body, Georgia, serif);
@@ -319,8 +310,8 @@ const markSvg = readFileSync(
   .back {
     position: absolute;
     z-index: 3;
-    top: 1.8rem;
-    left: 1.8rem;
+    top: var(--player-safe);
+    left: var(--player-safe);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -372,8 +363,9 @@ const markSvg = readFileSync(
   .badge {
     position: absolute;
     z-index: 3;
-    top: 2.3rem;
-    right: 1.8rem;
+    /* Centrada verticalmente con el símbolo de volver (2.75rem). */
+    top: calc(var(--player-safe) + 0.5rem);
+    right: var(--player-safe);
     color: var(--ink);
     font: 700 var(--text-player-badge)/1 var(--font-body, Georgia, serif);
     background: color-mix(in srgb, var(--paper) 80%, transparent);
@@ -402,7 +394,7 @@ const markSvg = readFileSync(
     font: 600 var(--text-xl)/1.3 var(--font-body, Georgia, serif);
   }
   .hint[data-mode="compact"] {
-    top: 2.3rem;
+    top: calc(var(--player-safe) + 0.5rem);
     transform: translateX(-50%);
     padding: 0.45rem 0.8rem;
     border-radius: 2rem;
@@ -432,9 +424,9 @@ const markSvg = readFileSync(
     z-index: 3;
     display: flex;
     flex-direction: column;
-    bottom: 1.8rem;
-    left: 1.8rem;
-    right: 1.8rem;
+    bottom: var(--player-safe);
+    left: var(--player-safe);
+    right: var(--player-safe);
   }
   .back,
   .badge,
@@ -607,9 +599,12 @@ const markSvg = readFileSync(
     display: none !important;
   }
   @media (max-width: 600px) {
+    .player {
+      --player-safe: 1rem;
+    }
     .paused-info {
       align-items: flex-end;
-      padding: 1.25rem 1.25rem 7.5rem;
+      padding: 1.25rem var(--player-safe) 7.5rem;
       background: linear-gradient(
         0deg,
         rgb(20 25 48 / 92%) 0%,
@@ -624,31 +619,24 @@ const markSvg = readFileSync(
       font-size: 1rem;
     }
     .back {
-      top: 1rem;
-      left: 1rem;
       gap: 0.55rem;
     }
     .back__label {
       font-size: var(--text-2xs);
     }
     .hint[data-mode="compact"] {
-      top: 4.4rem;
+      /* Debajo de la fila superior para no chocar con «Volver» y la etiqueta. */
+      top: calc(var(--player-safe) + 3.4rem);
       font-size: var(--text-2xs);
     }
     .hint[data-mode="intro"] {
       font-size: var(--text-md);
-    }
-    .badge {
-      top: 1rem;
-      right: 1rem;
     }
     .round {
       width: 2.75rem;
       height: 2.75rem;
     }
     .controls {
-      left: 1rem;
-      right: 1rem;
       bottom: 1.2rem;
     }
     .actions {

@@ -18,7 +18,7 @@ export function initPlayers() {
       const time = root.querySelector<HTMLOutputElement>("[data-time]")!;
       const subtitle = root.querySelector<HTMLElement>(".subtitle")!;
       const captions = root.querySelector<HTMLButtonElement>("[data-captions]");
-      const next = root.querySelector<HTMLAnchorElement>("[data-next]");
+      const nextHref = root.dataset.nextHref;
       const notice = root.querySelector<HTMLElement>("[data-notice]")!;
       const hint = root.querySelector<HTMLElement>(".hint")!;
       const status = root.querySelector<HTMLElement>("[data-status]")!;
@@ -184,7 +184,6 @@ export function initPlayers() {
         status.textContent = message;
         notice.hidden = false;
         retry.hidden = false;
-        if (next) next.hidden = true;
       };
       const update = () => {
         const current = master.currentTime || 0;
@@ -366,12 +365,8 @@ export function initPlayers() {
         video.pause();
         stopRendering();
         update();
-        if (next) {
-          status.textContent = "Terminó el episodio.";
-          notice.hidden = false;
-          retry.hidden = true;
-          next.hidden = false;
-        }
+        // Continue the series without an intermediate screen.
+        if (nextHref) window.location.assign(nextHref);
       });
       document.addEventListener(
         "visibilitychange",

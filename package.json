@@ -13,10 +13,12 @@
   "dependencies": {
     "@astrojs/check": "^0.9.5",
     "astro": "^7.4.11",
+    "dat.gui": "^0.7.9",
     "three": "^0.181.2",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.13",
     "@types/three": "^0.181.0"
   }
 }
